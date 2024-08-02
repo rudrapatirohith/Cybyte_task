@@ -30,19 +30,7 @@ const checkJwt = jwt({
   algorithms: ['RS256']
 });
 
-// // Middleware to attach user database info to request
-// const attachUserDatabase = (req, res, next) => {
-//   const user = req.auth; // Authenticated user info from JWT
 
-//   // Example: Attach user database information to the request object
-//   if (user && user['https://example.com/database']) {
-//     req.userDatabase = user['https://example.com/database'];
-//   } else {
-//     return res.status(401).json({ message: 'Unauthorized: No database info' });
-//   }
-
-//   next();
-// };
 
 // Protected route example
 app.get('/api/protected', checkJwt, (req, res) => {
@@ -50,21 +38,7 @@ app.get('/api/protected', checkJwt, (req, res) => {
 });
 
 
-// // Route to fetch data from the database based on user info
-// app.get('/api/data', checkJwt, attachUserDatabase, async (req, res) => {
-//   try {
-//     // Select the database based on user's info
-//     const db = req.userDatabase === 'db1' ? db1 : db2;
 
-//     // Query the selected database
-//     const [data] = await db.query('SELECT * FROM your_table'); // Adjust the query as needed
-
-//     // Return the data in the response
-//     res.json(data);
-//   } catch (error) {
-//     res.status(500).json({ error: 'Failed to fetch data', details: error.message });
-//   }
-// });
 
 // Route to create a user in Auth0 and insert into a database
 app.post('/api/users', async (req, res) => {
