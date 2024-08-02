@@ -136,6 +136,25 @@ app.put('/api/test/:id',async(req,res)=>{
 });
 
 
+
+//GET: Read
+app.get('/api/test/:id',async(req,res)=>{
+  const {id} = req.params;
+  try{
+    const [rows] = await db3.query('SELECT * from userinfo WHERE id = ? ',[id])
+    if(rows.length>0){
+      res.status(200).json({status:200,data: rows[0]});
+    }
+    else{
+      res.status(404).json({status:404,message:'Record not found'});
+    }
+  }
+  catch{
+    res.status(500).json({status:500,message: error.message});
+  }
+})
+
+
 // Start the server
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
