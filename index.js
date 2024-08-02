@@ -154,6 +154,25 @@ app.get('/api/test/:id',async(req,res)=>{
   }
 })
 
+//GET: Read all
+app.get('/api/test',async(req,res)=>{
+
+  try{
+    const [rows] = await db3.query('SELECT * from userinfo')
+
+    if(rows.length>0){
+      res.status(200).json({status:200,data: rows});
+    }
+    else{
+      res.status(404).json({status:404,message:'Record not found'});
+    }
+  }
+  catch{
+    res.status(500).json({status:500,message: error.message});
+  }
+})
+
+
 
 
 //DELETE: Delete
