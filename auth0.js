@@ -40,7 +40,7 @@ export async function createUser(userData) {
       { headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' } }
     );
     // console.log(response.data);
-    // console.log(token);
+    console.log(token);
     return response.data;
    
     
