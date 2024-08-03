@@ -64,107 +64,23 @@ app.post('/api/users', async (req, res) => {
 
 
 
-
-
-
 // POST: Create
-app.post('/api/test', async(req,res)=>{
-  const {name,age}= req.body;
+app.post('/api/test', async (req, res) => {
+  const { name, age } = req.body;
 
-  try{
-    const [result] =await db3.query('INSERT INTO userinfo (name,age) VALUES (?,?)',[name,age]);
-    res.status(200).json({status:200,message:'success',id: result.insertId});
-  }
-  catch(error){
-    res.status(500).json({status:500, message: error.message});
-  }
-})
-
-
-
-// PUT:Update
-app.put('/api/test/:id',async(req,res)=>{
-  const{id}=req.params;
-  const {name,age} = req.body;
-
-  // Check if ID and fields are provided
-  if (!id || !name || age === undefined) {
+  if (!name || age === undefined) {
     return res.status(400).json({ status: 400, message: 'Bad Request: Missing required fields' });
   }
 
-  try{
-    const [result] = await db3.query('UPDATE userinfo SET name = ?, age = ? WHERE id = ?',[name,age,id]);
-    
-    if(result.affectedRows>0){
-      res.status(200).json({status: 200, message:'success'});
-    }
-    else{
-      res.status(404).json({status: 404,message: 'Record not found'});
-    }
-  }
-  catch(error){
-    console.error('Error in PUT request:', error);
-
-    res.status(500).json({status:500, message:error.message});
+  try {
+    const [result] = await db3.query('CALL insertUserInfo(?, ?)', [name, age]);
+    res.status(200).json({ status: 200, message: 'success', id: result.insertId });
+  } catch (error) {
+    res.status(500).json({ status: 500, message: error.message });
   }
 });
 
 
-
-//GET: Read
-app.get('/api/test/:id',async(req,res)=>{
-  const {id} = req.params;
-  try{
-    const [rows] = await db3.query('SELECT * from userinfo WHERE id = ? ',[id])
-    if(rows.length>0){
-      res.status(200).json({status:200,data: rows[0]});
-    }
-    else{
-      res.status(404).json({status:404,message:'Record not found'});
-    }
-  }
-  catch{
-    res.status(500).json({status:500,message: error.message});
-  }
-})
-
-//GET: Read all
-app.get('/api/test',async(req,res)=>{
-
-  try{
-    const [rows] = await db3.query('SELECT * from userinfo')
-
-    if(rows.length>0){
-      res.status(200).json({status:200,data: rows});
-    }
-    else{
-      res.status(404).json({status:404,message:'Record not found'});
-    }
-  }
-  catch{
-    res.status(500).json({status:500,message: error.message});
-  }
-})
-
-
-
-
-//DELETE: Delete
-app.delete('/api/test/:id', async(req,res)=>{
-  const {id} = req.params;
-  try{
-    const [result] = await db3.query('DELETE FROM userinfo WHERE id=?',[id]);
-    if(result.affectedRows>0){
-      res.status(200).json({status:200,message:'success'});
-    }
-    else{
-      res.status(404).json({status:404,message:'Record not found'});
-    }
-  }
-    catch(error){
-      res.status(500).json({status:500,message:error.message});
-  }
-})
 
 
 // Start the server
