@@ -81,6 +81,29 @@ app.post('/api/test', async (req, res) => {
 });
 
 
+// PUT: Update
+app.put('/api/test/:id', async (req, res) => {
+  const { id } = req.params;
+  const { name, age } = req.body;
+
+  if (!id || !name || age === undefined) {
+    return res.status(400).json({ status: 400, message: 'Bad Request: Missing required fields' });
+  }
+
+  try {
+    const [result] = await db3.query('CALL updateUserInfo(?, ?, ?)', [id, name, age]);
+
+    if (result.affectedRows > 0) {
+      res.status(200).json({ status: 200, message: 'success' });
+    } else {
+      res.status(404).json({ status: 404, message: 'Record not found' });
+    }
+  } catch (error) {
+    console.error('Error in PUT request:', error);
+    res.status(500).json({ status: 500, message: error.message });
+  }
+});
+
 
 
 // Start the server
