@@ -122,6 +122,21 @@ app.get('/api/test/:id', async (req, res) => {
   }
 });
 
+// GET: Read all
+app.get('/api/test', async (req, res) => {
+  try {
+    const [rows] = await db3.query('CALL getAllUsersInfo()');
+
+    if (rows[0].length > 0) {
+      res.status(200).json({ status: 200, data: rows[0] });
+    } else {
+      res.status(404).json({ status: 404, message: 'No records found' });
+    }
+  } catch (error) {
+    res.status(500).json({ status: 500, message: error.message });
+  }
+});
+
 
 
 // Start the server
