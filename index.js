@@ -137,7 +137,22 @@ app.get('/api/test', async (req, res) => {
   }
 });
 
+// DELETE: Delete
+app.delete('/api/test/:id', async (req, res) => {
+  const { id } = req.params;
 
+  try {
+    const [result] = await db3.query('CALL deleteUserinfo(?)', [id]);
+
+    if (result.affectedRows > 0) {
+      res.status(200).json({ status: 200, message: 'success' });
+    } else {
+      res.status(404).json({ status: 404, message: 'Record not found' });
+    }
+  } catch (error) {
+    res.status(500).json({ status: 500, message: error.message });
+  }
+});
 
 // Start the server
 app.listen(PORT, () => {
