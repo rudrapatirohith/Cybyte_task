@@ -4,12 +4,6 @@ import dotenv from 'dotenv';
 dotenv.config({path: './config.env'});
 
 
-console.log('Database Host:', process.env.DB_HOST);
-console.log('Database User:', process.env.DB_USER);
-console.log('Database Password:', process.env.DB_PASSWORD);
-console.log('Database Name:', process.env.DB_NAME);
-
-
 // Create a connection pool to the MySQL database
    const insertInfo = createPool({
     host: process.env.DB_HOST,
@@ -20,7 +14,6 @@ console.log('Database Name:', process.env.DB_NAME);
     connectionLimit: 10,
     queueLimit: 0,
 });
-// console.log('Database connections established successfully.');
 
 // Test the database connection
 const testConnection = async () => {
