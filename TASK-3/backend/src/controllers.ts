@@ -68,4 +68,3 @@ export const insertData = async(req:Request,res:Response)=>{
 };
 
 
-
