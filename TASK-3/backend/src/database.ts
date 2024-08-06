@@ -3,10 +3,15 @@ import dotenv from 'dotenv';
 
 dotenv.config({path: './config.env'});
 
+
+console.log('Database Host:', process.env.DB_HOST);
+console.log('Database User:', process.env.DB_USER);
+console.log('Database Password:', process.env.DB_PASSWORD);
+console.log('Database Name:', process.env.DB_NAME);
+
+
 // Create a connection pool to the MySQL database
-let loginData;
-try{
-   loginData = createPool({
+   const insertInfo = createPool({
     host: process.env.DB_HOST,
     user: process.env.DB_USER,
     password: process.env.DB_PASSWORD,
@@ -15,10 +20,18 @@ try{
     connectionLimit: 10,
     queueLimit: 0,
 });
-console.log('Database connections established successfully.');
-}
-catch (error) {
-    console.error('Error establishing database connections:', error);
-  }
+// console.log('Database connections established successfully.');
 
-export default loginData;
+// Test the database connection
+const testConnection = async () => {
+  try {
+      const [rows] = await insertInfo.query('SELECT 1');
+      console.log('Connected to the database successfully:', rows);
+  } catch (err) {
+      console.error('Error connecting to the database:', err);
+  }
+};
+
+testConnection();
+
+export default insertInfo;
