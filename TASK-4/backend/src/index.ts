@@ -1,7 +1,7 @@
 import express from 'express';
 import dotenv from 'dotenv';
 import bodyParser from 'body-parser';
-import { insertData, loginUser, Signup } from './controllers';
+import authRoutes from './Routes/routes'
 
 dotenv.config({path: './config.env'});
 
@@ -19,14 +19,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static('public'));
 
 
-
-// Routes
-app.post('/signup',Signup);
-
-app.post('/login',loginUser);
-
-app.post('/insert-data',insertData);
-
+app.use('/api',authRoutes);
 
 app.listen(port,()=>{console.log(`Server Started running on http://localhost:${port} `);
 

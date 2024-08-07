@@ -1,5 +1,5 @@
 import { Request,Response } from "express";
-import insertInfo from "./database";
+import insertInfo from "../Models/database";
 import { ResultSetHeader, RowDataPacket } from "mysql2";
 
 //Controller to handlle user signup
