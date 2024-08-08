@@ -1,5 +1,6 @@
 import express from 'express';
-import { insertData, loginUser, Signup } from '../Controllers/controllers';
+import { forgotPassword, insertData, loginUser, logoutUser, resetPassword, Signup } from '../Controllers/controllers';
+import { authenticateJWT } from '../Middleware/jwttoken';
 
 const route = express.Router();
 
@@ -8,7 +9,12 @@ route.post('/signup',Signup);
 
 route.post('/login',loginUser);
 
-route.post('/insert-data',insertData);
+route.post('/insert-data',authenticateJWT,insertData);
 
+route.post('/logout',logoutUser);
+
+route.post('/forgot-password',forgotPassword);
+
+route.post('/reset-password',resetPassword);
 
 export default route;

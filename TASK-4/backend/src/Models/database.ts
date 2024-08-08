@@ -1,7 +1,7 @@
 import { createPool } from "mysql2/promise";
 import dotenv from 'dotenv';
 
-dotenv.config({path: './config.env'});
+dotenv.config({path: '././config.env'});
 
 
 // Create a connection pool to the MySQL database
