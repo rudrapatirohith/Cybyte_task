@@ -3,10 +3,10 @@ import dotenv from 'dotenv';
 import bodyParser from 'body-parser';
 import authRoutes from './Routes/routes'
 
-dotenv.config({path: './config.env'});
+dotenv.config({ path: './config.env' });
 
 const app = express();
-const port = process.env.PORT ;
+const port = process.env.PORT;
 
 
 // This Middleware helps us to serve static files from the 'public' directory
@@ -19,8 +19,9 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static('public'));
 
 
-app.use('/api',authRoutes);
+app.use('/api', authRoutes);
 
-app.listen(port,()=>{console.log(`Server Started running on http://localhost:${port} `);
+app.listen(port, () => {
+    console.log(`Server Started running on http://localhost:${port} `);
 
 })

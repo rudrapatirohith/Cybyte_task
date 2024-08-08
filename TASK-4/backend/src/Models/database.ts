@@ -1,11 +1,11 @@
 import { createPool } from "mysql2/promise";
 import dotenv from 'dotenv';
 
-dotenv.config({path: '././config.env'});
+dotenv.config({ path: '././config.env' });
 
 
 // Create a connection pool to the MySQL database
-   const insertInfo = createPool({
+const insertInfo = createPool({
     host: process.env.DB_HOST,
     user: process.env.DB_USER,
     password: process.env.DB_PASSWORD,
@@ -17,12 +17,12 @@ dotenv.config({path: '././config.env'});
 
 // Test the database connection
 const testConnection = async () => {
-  try {
-      const [rows] = await insertInfo.query('SELECT 1');
-      console.log('Connected to the database successfully:', rows);
-  } catch (err) {
-      console.error('Error connecting to the database:', err);
-  }
+    try {
+        const [rows] = await insertInfo.query('SELECT 1');
+        console.log('Connected to the database successfully:', rows);
+    } catch (err) {
+        console.error('Error connecting to the database:', err);
+    }
 };
 
 testConnection();

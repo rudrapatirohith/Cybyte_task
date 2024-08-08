@@ -17,7 +17,7 @@ export const authenticateJWT = (req: Request, res: Response, next: NextFunction)
             }
 
             // Attach user info to request object
-           (req as any).user = user;
+            (req as any).user = user;
             next();
         });
     } else {
