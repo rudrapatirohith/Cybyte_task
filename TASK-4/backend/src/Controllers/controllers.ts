@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
-import insertInfo from "../Models/database";
-import { ResultSetHeader, RowDataPacket } from "mysql2";
+import {createConnection, insertInfo} from "../Models/database";
+import {  RowDataPacket } from "mysql2";
 import bcrypt from 'bcrypt';
 import jwt, { JwtPayload } from 'jsonwebtoken';
 import dotenv from 'dotenv';
@@ -139,3 +139,29 @@ export const resetPassword = async (req: Request, res: Response) => {
         res.status(400).json({ message: 'Invalid or expired token' });
     }
 };
+
+
+
+export const testMultiDb = async(req: Request,res: Response)=>{
+    const {id} = req.params;
+
+    try{
+        const db = await createConnection(id);
+        let result;
+
+        if(id==='1'){
+            result = await db.query('SELECT * FROM users');
+        }
+        else if (id==='2'){
+            result = await db.query('SELECT * FROM usersInfo');
+        }
+        else{
+            return res.status(400).json({message: 'Invalid ID provided'});
+        }
+        res.status(200).json(result[0]);
+    }
+    catch(error){
+        console.error('Error fetching data:', error);
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
+}

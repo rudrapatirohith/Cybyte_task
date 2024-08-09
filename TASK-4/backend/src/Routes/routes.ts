@@ -1,5 +1,5 @@
 import express from 'express';
-import { forgotPassword, insertData, loginUser, logoutUser, resetPassword, Signup } from '../Controllers/controllers';
+import { forgotPassword, insertData, loginUser, logoutUser, resetPassword, Signup, testMultiDb } from '../Controllers/controllers';
 import { authenticateJWT } from '../Middleware/jwttoken';
 
 const route = express.Router();
@@ -16,5 +16,10 @@ route.post('/logout', logoutUser);
 route.post('/forgot-password', forgotPassword);
 
 route.post('/reset-password', resetPassword);
+
+
+
+route.get('/testMultiDb/:id',testMultiDb);
+
 
 export default route;
