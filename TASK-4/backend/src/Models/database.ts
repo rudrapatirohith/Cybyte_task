@@ -62,14 +62,17 @@ const createConnection = async(id: string): Promise<Pool>=>{
 
 // Test the database connection
 const testConnection = async (): Promise<void> => {
-    try {
-        const [rows] = await insertInfo.query('SELECT 1');
-        console.log('Connected to the database successfully:', rows);
-    } catch (err) {
+   
+    insertInfo.query('SELECT 1')
+    .then((rows)=>{
+        console.log('Connected to the database successfully:', rows[0]);
+
+    })
+    .catch(err=> {
         const error = err as Error;
         console.error('Error connecting to the database:', error.message);
         console.error('Stack Trace:', error.stack);
-    }
+    });
 };
 
 testConnection();
