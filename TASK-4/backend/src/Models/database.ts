@@ -3,16 +3,6 @@ import dotenv from 'dotenv';
 
 dotenv.config({ path: '././config.env' });
 
-// Create a connection pool to the MySQL database for default use
-const insertInfo: Pool = createPool({
-    host: process.env.DB_HOST,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    database: process.env.DB_NAME,
-    waitForConnections: true,
-    connectionLimit: 10,
-    queueLimit: 0,
-});
 
 // Function to create a connection pool dynamically based on an ID
 const createConnection = async (id: string): Promise<Pool> => {
@@ -53,22 +43,8 @@ const createConnection = async (id: string): Promise<Pool> => {
     return pool;
 };
 
-// Test the default database connection
-const testConnection = async (): Promise<void> => {
-    insertInfo.query('SELECT 1')
-        .then((rows) => {
-            // I am logging a success message if the connection to the database is successful
-            console.log('Connected to the database successfully:', rows[0]);
-        })
-        .catch(err => {
-            // I am catching and logging any errors that occur during the connection
-            const error = err as Error;
-            console.error('Error connecting to the database:', error.message);
-            console.error('Stack Trace:', error.stack);
-        });
-};
 
-// I am running the test connection function to check the default database connection
-testConnection();
 
-export { insertInfo, createConnection };
+
+
+export {  createConnection };
