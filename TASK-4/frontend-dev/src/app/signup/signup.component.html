@@ -1,0 +1,22 @@
+<div class="signup-container">
+    <form class="signup-form"[formGroup]="signupForm" (ngSubmit)="onSignup()">
+      <h2>Sign Up</h2>
+  
+      <label for="name">Name:</label>
+      <input id="name" formControlName="name" type="text"  placeholder="Enter your name" required/>
+  
+      <label for="email">Email:</label>
+      <input id="email" formControlName="email" type="email" placeholder="Enter your email" required />
+  
+      <label for="password">Password:</label>
+      <input id="password" formControlName="password" type="password"  placeholder="Create a password" required/>
+  
+      <label for="confirm-password">Confirm Password:</label>
+      <input id="confirm-password" formControlName="confirmPassword" type="password" placeholder="Confirm your password" (input)="hasPasswordMismatch()" required />
+  
+      <button type="submit" [disabled]="!signupForm.valid || hasPasswordMismatch()">Sign Up</button>
+  
+      <p class="login-link">Already have an account? <a href="/login">Login</a></p>
+    </form>
+  </div>
+  

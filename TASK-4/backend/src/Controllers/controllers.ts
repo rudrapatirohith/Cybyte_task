@@ -26,6 +26,9 @@ export const Signup = (req: Request, res: Response) => {
 
     bcrypt.hash(password, 7) // Hashing the user's password
         .then(hashedPassword => {
+            if (!req.db) {
+                throw new Error("Database connection not available");
+            }
             // Inserting the user into the database with the hashed password
             return req.db?.query('INSERT INTO patientsAuth (name, email, password) VALUES (?, ?, ?)', [name, email, hashedPassword]);
         })

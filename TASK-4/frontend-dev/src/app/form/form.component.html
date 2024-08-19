@@ -1,0 +1,37 @@
+<form [formGroup]="insertForm" (ngSubmit)="onSubmit()">
+    <label for="text_field">Text Field:</label>
+    <input id="text_field" formControlName="text_field" type="text" />
+  
+    <label for="email">Email:</label>
+    <input id="email" formControlName="email" type="email" />
+  
+    <label for="pdf_file">PDF File:</label>
+    <input id="pdf_file" formControlName="pdf_file" type="file" />
+  
+    <label for="image_file">Image File:</label>
+    <input id="image_file" formControlName="image_file" type="file" />
+  
+    <label for="dropdown_field">Dropdown:</label>
+    <select id="dropdown_field" formControlName="dropdown_field">
+      <option value="">Select...</option>
+      <option value="option1">Option 1</option>
+      <option value="option2">Option 2</option>
+    </select>
+  
+    <label>Radio List:</label>
+    <label><input type="radio" formControlName="radio_list" value="radio1" /> Radio 1</label>
+    <label><input type="radio" formControlName="radio_list" value="radio2" /> Radio 2</label>
+  
+    <label>Checkbox List:</label>
+    <label><input type="checkbox" (change)="onCheckboxChange($event)" value="checkbox1" /> Checkbox 1</label>
+    <label><input type="checkbox" (change)="onCheckboxChange($event)" value="checkbox2" /> Checkbox 2</label>
+  
+    <label>List Box:</label>
+    <select multiple (change)="onListBoxChange($event)">
+      <option value="item1">Item 1</option>
+      <option value="item2">Item 2</option>
+    </select>
+  
+    <button type="submit">Submit</button>
+    <button type="button" (click)="onUpdate()">Update</button>
+</form>
