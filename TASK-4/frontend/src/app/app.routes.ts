@@ -1,8 +1,19 @@
 import { Routes } from '@angular/router';
-import { InsertDataFormComponent } from './insert-data-form/insert-data-form.component';
+import { FormComponent } from './form/form.component';
+import { LoginComponent } from './login/login.component';
+import { SignupComponent } from './signup/signup.component';
 
 export const routes: Routes = [
-    {path: '', redirectTo:'/insert-data.',pathMatch:'full'},
-    {path:'insert-data',component:InsertDataFormComponent},
-    {path: '**', redirectTo: ''}
+    {
+        path: '', redirectTo:'signup', pathMatch:'full'
+    },
+    {
+        path: 'form', component: FormComponent
+    },
+    {
+        path: 'login', component: LoginComponent
+    },
+    {
+        path: 'signup', component: SignupComponent
+    }
 ];

@@ -1,5 +1,5 @@
 import express from 'express';
-import { forgotPassword, insertData, loginUser, logoutUser, resetPassword, Signup } from '../Controllers/controllers';
+import { forgotPassword, insertData, insertDataTest, loginUser, logoutUser, resetPassword, Signup } from '../Controllers/controllers';
 import { authenticateJWT } from '../Middleware/jwttoken';
 import { selectDatabse } from '../Middleware/selectDatabase';
 
@@ -17,6 +17,9 @@ route.post('/logout',selectDatabse, logoutUser);
 route.post('/forgot-password',selectDatabse, forgotPassword);
 
 route.post('/reset-password',selectDatabse, resetPassword);
+
+route.post('/insert-data-test',insertDataTest);
+
 
 
 export default route;

@@ -61,23 +61,44 @@ export class FormComponent {
     }
   }
 
+
+  onFileChange(event: any, controlName: string) {
+    const file = event.target.files[0];
+    this.insertForm.patchValue({
+      [controlName]: file
+    });
+    this.insertForm.get(controlName)?.updateValueAndValidity();
+  }
+
+
   // Marked the method as 'async'
   async onSubmit() {
     if (this.insertForm.valid) {
       const formData = new FormData();
 
-      for (const key in this.insertForm.value) {
-        formData.append(key, this.insertForm.value[key]);
+      // for (const key in this.insertForm.value) {
+      //   formData.append(key, this.insertForm.value[key]);
+      // }
+
+      // formData.append('pdf_file', this.insertForm.get('pdf_file')?.value);
+      // formData.append('image_file', this.insertForm.get('image_file')?.value);
+
+      // Append each form field to FormData
+      for (const key in this.insertForm.controls) {
+        if (this.insertForm.get(key)?.value instanceof File) {
+          formData.append(key, this.insertForm.get(key)?.value);
+        } else {
+          formData.append(key, JSON.stringify(this.insertForm.get(key)?.value));
+        }
       }
 
-      formData.append('pdf_file', this.insertForm.get('pdf_file')?.value);
-      formData.append('image_file', this.insertForm.get('image_file')?.value);
-
-      const token = localStorage.getItem('jwtToken');
-      const headers = new HttpHeaders({ 'Authorization': `Bearer ${token}` });
+      // const token = localStorage.getItem('jwtToken');
+      // const headers = new HttpHeaders({ 'Authorization': `Bearer ${token}` });
 
       try {
-        const response = await firstValueFrom(this.http.post('/api/insert-data', formData, { headers }));
+        // const response = await firstValueFrom(this.http.post('/api/insert-data-test', formData, { headers }));
+        const response = await firstValueFrom(this.http.post('http://localhost:4242/api/insert-data-test', formData));
+
         console.log('Data inserted successfully:', response);
       } catch (error) {
         console.error('Error inserting data:', error);
@@ -92,13 +113,21 @@ export class FormComponent {
     if (this.insertForm.valid) {
       const formData = new FormData();
 
-      for (const key in this.insertForm.value) {
-        formData.append(key, this.insertForm.value[key]);
+      // for (const key in this.insertForm.value) {
+      //   formData.append(key, this.insertForm.value[key]);
+      // }
+
+      // formData.append('pdf_file', this.insertForm.get('pdf_file')?.value);
+      // formData.append('image_file', this.insertForm.get('image_file')?.value);
+
+      for (const key in this.insertForm.controls) {
+        if (this.insertForm.get(key)?.value instanceof File) {
+          formData.append(key, this.insertForm.get(key)?.value);
+        } else {
+          formData.append(key, JSON.stringify(this.insertForm.get(key)?.value));
+        }
       }
-
-      formData.append('pdf_file', this.insertForm.get('pdf_file')?.value);
-      formData.append('image_file', this.insertForm.get('image_file')?.value);
-
+      
       const token = localStorage.getItem('jwtToken');
       const headers = new HttpHeaders({ 'Authorization': `Bearer ${token}` });
 

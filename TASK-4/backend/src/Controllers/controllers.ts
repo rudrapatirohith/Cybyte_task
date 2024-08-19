@@ -3,6 +3,8 @@ import bcrypt from 'bcrypt';
 import jwt, { JwtPayload } from 'jsonwebtoken';
 import dotenv from 'dotenv';
 import { PoolConnection } from 'mysql2/promise';
+import {insertInfo} from '../Models/database'
+
 
 dotenv.config({ path: '././config.env' });
 
@@ -202,4 +204,36 @@ export const resetPassword = (req: Request, res: Response) => {
             req.db?.release();
             console.log('Connection released after password reset');
         });
+};
+
+
+
+
+// Controller to insert data
+export const insertDataTest = (req: Request, res: Response) => {
+    const {
+        text_field, multi_line_text, email, telephone, number_field,
+        date_field, time_field, timestamp_field, checkbox_field, dropdown_field,
+        radio_list, checkbox_list, pdf_file, image_file, list_box
+    } = req.body; // Extracting data fields from the request body
+
+    if(!text_field || !multi_line_text || !email || !telephone || !number_field ||
+        !date_field || !time_field || !timestamp_field || !checkbox_field || !dropdown_field
+      ||  !radio_list || !checkbox_list || !pdf_file || !image_file || !list_box){
+        res.status(401).json({message:'Missing data in some fields'})
+      }
+   insertInfo.query(
+        'INSERT INTO usersinfo (text_field, multi_line_text, email, telephone, number_field, date_field, time_field, timestamp_field, checkbox_field, dropdown_field, radio_list, checkbox_list, pdf_file, image_file, list_box) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+        [text_field, multi_line_text, email, telephone, number_field, date_field, time_field, timestamp_field, checkbox_field, dropdown_field, radio_list, checkbox_list, pdf_file, image_file, list_box]
+    ) // Inserting the data into the database
+        .then((result: any) => {
+            // Sending a success response with the new data's ID
+            res.status(201).json({ message: 'Data inserted successfully', userId: result[0].insertId });
+        })
+        .catch((error: any) => {
+            // Handling errors during the data insertion process
+            console.error('Insert Data Error:', error);
+            res.status(500).json({ message: 'Internal server error' });
+        })
+        
 };

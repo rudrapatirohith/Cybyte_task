@@ -1,0 +1,58 @@
+<form [formGroup]="insertForm" (ngSubmit)="onSubmit()">
+  <label for="text_field">Text Field:</label>
+  <input id="text_field" formControlName="text_field" type="text" />
+
+  <label for="multi_line_text">Multi-line Text:</label>
+  <textarea id="multi_line_text" formControlName="multi_line_text"></textarea>
+
+  <label for="email">Email:</label>
+  <input id="email" formControlName="email" type="email" />
+
+  <label for="telephone">Telephone:</label>
+  <input id="telephone" formControlName="telephone" type="text" />
+
+  <label for="number_field">Number Field:</label>
+  <input id="number_field" formControlName="number_field" type="number" />
+
+  <label for="date_field">Date Field:</label>
+  <input id="date_field" formControlName="date_field" type="date" />
+
+  <label for="time_field">Time Field:</label>
+  <input id="time_field" formControlName="time_field" type="time" />
+
+  <label for="timestamp_field">Timestamp Field:</label>
+  <input id="timestamp_field" formControlName="timestamp_field" type="datetime-local" />
+
+  <label for="checkbox_field">Checkbox Field:</label>
+  <input id="checkbox_field" formControlName="checkbox_field" type="checkbox" />
+
+  <label for="dropdown_field">Dropdown:</label>
+  <select id="dropdown_field" formControlName="dropdown_field">
+    <option value="">Select...</option>
+    <option value="option1">Option 1</option>
+    <option value="option2">Option 2</option>
+  </select>
+
+  <label>Radio List:</label>
+  <label><input type="radio" formControlName="radio_list" value="radio1" /> Radio 1</label>
+  <label><input type="radio" formControlName="radio_list" value="radio2" /> Radio 2</label>
+
+  <label>Checkbox List:</label>
+  <label><input type="checkbox" (change)="onCheckboxChange($event)" value="checkbox1" /> Checkbox 1</label>
+  <label><input type="checkbox" (change)="onCheckboxChange($event)" value="checkbox2" /> Checkbox 2</label>
+
+  <label>List Box:</label>
+  <select multiple (change)="onListBoxChange($event)">
+    <option value="item1">Item 1</option>
+    <option value="item2">Item 2</option>
+  </select>
+
+  <label for="pdf_file">PDF File:</label>
+  <input id="pdf_file" type="file" (change)="onFileChange($event, 'pdf_file')" />
+
+  <label for="image_file">Image File:</label>
+  <input id="image_file" type="file" (change)="onFileChange($event, 'image_file')" />
+
+  <button type="submit">Submit</button>
+  <button type="button" (click)="onUpdate()">Update</button>
+</form>
