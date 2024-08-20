@@ -4,11 +4,11 @@ import { Connection, Pool, PoolConnection } from "mysql2/promise";
 
 
 export const selectDatabse = (req:Request,res: Response,next: NextFunction)=>{
-    const {id} = req.body;
+    const {id} = req.body || '1';
 
-    if(!id){
-        return res.status(400).json({message: 'Database ID is required'});
-    }
+    // if(!id){
+    //     return res.status(400).json({message: 'Database ID is required'});
+    // }
 
     if(id < 1 || id > 2){
         return res.status(400).json({message: 'Database ID is Incorrect'});

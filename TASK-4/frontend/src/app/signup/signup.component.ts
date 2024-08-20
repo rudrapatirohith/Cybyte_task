@@ -24,15 +24,15 @@ export class SignupComponent {
 
   onSignup(): void {
     if (this.signupForm.valid && !this.hasPasswordMismatch()) {
-      const id=1;
+      // const id=1;
       const { name, email, password } = this.signupForm.value;
       console.log(this.signupForm);
-      console.log(id);
+      // console.log(id);
       console.log(name);
       console.log(email);
       console.log(password);
 
-      this.http.post('http://localhost:4242/api/signup', { id,name, email, password }).subscribe({
+      this.http.post('http://localhost:4242/api/signup', {name, email, password }).subscribe({
         next: (response) => {
           console.log('User signed up successfully', response);
           this.router.navigate(['/login']);

@@ -34,10 +34,18 @@ const createConnection = async (id: string): Promise<Pool> => {
             connectTimeout: 10000
         };
     } else {
-        // I am throwing an error if the ID is invalid
-        throw new Error('Invalid ID provided');
+        connectionConfig = {
+            host: process.env.DB01_HOST,
+            port: parseInt(process.env.DB01_PORT || '3336'),
+            user: process.env.DB01_USER,
+            password: process.env.DB01_PASSWORD,
+            database: process.env.DB01_NAME,
+            waitForConnections: true,
+            connectionLimit: 10,
+            queueLimit: 0,
+            connectTimeout: 10000
     }
-
+    };
     // I am creating a new connection pool with the specified configuration
     const pool: Pool = createPool(connectionConfig);
     return pool;

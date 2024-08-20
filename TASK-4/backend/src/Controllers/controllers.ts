@@ -4,7 +4,7 @@ import jwt, { JwtPayload } from 'jsonwebtoken';
 import dotenv from 'dotenv';
 import { PoolConnection } from 'mysql2/promise';
 import {insertInfo} from '../Models/database'
-
+import multer from 'multer';
 
 dotenv.config({ path: '././config.env' });
 
@@ -13,6 +13,10 @@ declare module 'express' {
     interface Request {
         db?: PoolConnection;
     }
+}
+
+interface Files {
+    [fieldname: string]: Express.Multer.File[]; // Multer files are stored as arrays
 }
 
 // Controller to handle user signup
@@ -209,21 +213,35 @@ export const resetPassword = (req: Request, res: Response) => {
 
 
 
+
 // Controller to insert data
 export const insertDataTest = (req: Request, res: Response) => {
     const {
         text_field, multi_line_text, email, telephone, number_field,
         date_field, time_field, timestamp_field, checkbox_field, dropdown_field,
-        radio_list, checkbox_list, pdf_file, image_file, list_box
+        radio_list, checkbox_list, list_box
     } = req.body; // Extracting data fields from the request body
+
+
+  // Cast req.files to the expected type
+  const files = req.files as Record<string, Express.Multer.File[]>;
+
+  const pdf_file = files['pdf_file'] ? files['pdf_file'][0]?.filename : null; // Access the filename of the uploaded PDF
+  const image_file = files['image_file'] ? files['image_file'][0]?.filename : null; // Access the filename of the uploaded image
+
+
+
+    console.log(req.body);
+    console.log('Uploaded Files:', { pdf_file, image_file });
+
 
     if(!text_field || !multi_line_text || !email || !telephone || !number_field ||
         !date_field || !time_field || !timestamp_field || !checkbox_field || !dropdown_field
-      ||  !radio_list || !checkbox_list || !pdf_file || !image_file || !list_box){
+      ||  !radio_list || !checkbox_list  || !list_box){
         res.status(401).json({message:'Missing data in some fields'})
       }
-   insertInfo.query(
-        'INSERT INTO usersinfo (text_field, multi_line_text, email, telephone, number_field, date_field, time_field, timestamp_field, checkbox_field, dropdown_field, radio_list, checkbox_list, pdf_file, image_file, list_box) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+    req.db?.query(
+        'INSERT INTO patientsInfo (text_field, multi_line_text, email, telephone, number_field, date_field, time_field, timestamp_field, checkbox_field, dropdown_field, radio_list, checkbox_list, pdf_file, image_file, list_box) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
         [text_field, multi_line_text, email, telephone, number_field, date_field, time_field, timestamp_field, checkbox_field, dropdown_field, radio_list, checkbox_list, pdf_file, image_file, list_box]
     ) // Inserting the data into the database
         .then((result: any) => {
@@ -233,7 +251,79 @@ export const insertDataTest = (req: Request, res: Response) => {
         .catch((error: any) => {
             // Handling errors during the data insertion process
             console.error('Insert Data Error:', error);
+            // if (!res.headersSent) {
+            //     res.status(500).json({ message: 'Internal server error' });
+            // }      
             res.status(500).json({ message: 'Internal server error' });
         })
-        
+        .finally(() => {
+            // Releasing the database connection after the operation is complete
+            req.db?.release();
+            console.log('Connection released after data insertion');
+        });
+};
+
+
+
+
+
+
+// Controller to insert data
+export const updateDataTest = (req: Request, res: Response) => {
+    const {
+        text_field, multi_line_text, email, telephone, number_field,
+        date_field, time_field, timestamp_field, checkbox_field, dropdown_field,
+        radio_list, checkbox_list, list_box
+    } = req.body; // Extracting data fields from the request body
+
+
+  // Cast req.files to the expected type
+  const files = req.files as Record<string, Express.Multer.File[]>;
+
+  const pdf_file = files['pdf_file'] ? files['pdf_file'][0]?.filename : null; // Access the filename of the uploaded PDF
+  const image_file = files['image_file'] ? files['image_file'][0]?.filename : null; // Access the filename of the uploaded image
+
+
+
+    console.log(req.body);
+    console.log('Uploaded Files:', { pdf_file, image_file });
+
+
+    if(!text_field || !multi_line_text || !email || !telephone || !number_field ||
+        !date_field || !time_field || !timestamp_field || !checkbox_field || !dropdown_field
+      ||  !radio_list || !checkbox_list  || !list_box){
+        res.status(401).json({message:'Missing data in some fields'})
+      }
+
+
+      const userId = req.params.id;  // Assuming the ID of the record to update is passed in the URL
+
+    req.db?.query(
+        `UPDATE patientsInfo 
+         SET text_field = ?, multi_line_text = ?, email = ?, telephone = ?, number_field = ?, 
+             date_field = ?, time_field = ?, timestamp_field = ?, checkbox_field = ?, dropdown_field = ?, 
+             radio_list = ?, checkbox_list = ?, pdf_file = ?, image_file = ?, list_box = ? 
+         WHERE id = ?`,
+        [text_field, multi_line_text, email, telephone, number_field, date_field, time_field, timestamp_field, checkbox_field, dropdown_field, radio_list, checkbox_list, pdf_file, image_file, list_box,userId]
+    ) // Inserting the data into the database
+        .then((result: any) => {
+            // Sending a success response with the new data's ID
+            if(result.affectedRows>0){
+                res.status(201).json({ message: 'Data updated successfully' });
+            }
+            else{
+                res.status(404).json({ message: 'Record not found' });
+            }
+        })
+        .catch((error: any) => {
+            // Handling errors during the data insertion process
+            console.error('Update Data Error:', error);
+          
+            res.status(500).json({ message: 'Internal server error' });
+        })
+        .finally(() => {
+            // Releasing the database connection after the operation is complete
+            req.db?.release();
+            console.log('Connection released after data insertion');
+        });
 };

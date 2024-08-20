@@ -12,9 +12,9 @@ const port = process.env.PORT;
 
 app.use(cors(
     {
-        origin: 'http://localhost:4200', // Your Angular app's URL
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  credentials: true
+        origin: 'http://localhost:4200', // my Angular app's URL
+        methods: ['GET', 'POST', 'PUT', 'DELETE'],
+        credentials: true
     }
 ));
 
