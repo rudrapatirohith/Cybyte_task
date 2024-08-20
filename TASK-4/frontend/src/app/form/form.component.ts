@@ -20,46 +20,46 @@ import { firstValueFrom } from 'rxjs';
 export class FormComponent {
   insertForm: FormGroup;
 
-  constructor(private http: HttpClient) {
-    this.insertForm = new FormGroup({
-      text_field: new FormControl('', [Validators.required]),
-      multi_line_text: new FormControl(''),
-      email: new FormControl('', [Validators.required, Validators.email]),
-      telephone: new FormControl('', [Validators.pattern(/^\d{10}$/)]),
-      number_field: new FormControl('', [Validators.required, Validators.min(1)]),
-      date_field: new FormControl('', [Validators.required]),
-      time_field: new FormControl('', [Validators.required]),
-      timestamp_field: new FormControl('', [Validators.required]),
-      checkbox_field: new FormControl(false),
-      dropdown_field: new FormControl('', [Validators.required]),
-      radio_list: new FormControl('', [Validators.required]),
-      checkbox_list: new FormArray([], [Validators.required]),
-      pdf_file: new FormControl('', [Validators.required]),
-      image_file: new FormControl('', [Validators.required]),
-      list_box: new FormArray([], [Validators.required]),
-    });
-  }
-
-
   // constructor(private http: HttpClient) {
   //   this.insertForm = new FormGroup({
-  //     text_field: new FormControl(''),
+  //     text_field: new FormControl('', [Validators.required]),
   //     multi_line_text: new FormControl(''),
-  //     email: new FormControl('', [Validators.email]),
+  //     email: new FormControl('', [Validators.required, Validators.email]),
   //     telephone: new FormControl('', [Validators.pattern(/^\d{10}$/)]),
-  //     number_field: new FormControl('', [Validators.min(1)]),
-  //     date_field: new FormControl(''),
-  //     time_field: new FormControl(''),
-  //     timestamp_field: new FormControl(''),
+  //     number_field: new FormControl('', [Validators.required, Validators.min(1)]),
+  //     date_field: new FormControl('', [Validators.required]),
+  //     time_field: new FormControl('', [Validators.required]),
+  //     timestamp_field: new FormControl('', [Validators.required]),
   //     checkbox_field: new FormControl(false),
-  //     dropdown_field: new FormControl(''),
-  //     radio_list: new FormControl(''),
-  //     checkbox_list: new FormArray([]),
-  //     pdf_file: new FormControl(''),
-  //     image_file: new FormControl(''),
-  //     list_box: new FormArray([]),
+  //     dropdown_field: new FormControl('', [Validators.required]),
+  //     radio_list: new FormControl('', [Validators.required]),
+  //     checkbox_list: new FormArray([], [Validators.required]),
+  //     pdf_file: new FormControl('', [Validators.required]),
+  //     image_file: new FormControl('', [Validators.required]),
+  //     list_box: new FormArray([], [Validators.required]),
   //   });
   // }
+
+
+  constructor(private http: HttpClient) {
+    this.insertForm = new FormGroup({
+      text_field: new FormControl(''),
+      multi_line_text: new FormControl(''),
+      email: new FormControl('', [Validators.email]),
+      telephone: new FormControl('', [Validators.pattern(/^\d{10}$/)]),
+      number_field: new FormControl('', [Validators.min(1)]),
+      date_field: new FormControl(''),
+      time_field: new FormControl(''),
+      timestamp_field: new FormControl(''),
+      checkbox_field: new FormControl(false),
+      dropdown_field: new FormControl(''),
+      radio_list: new FormControl(''),
+      checkbox_list: new FormArray([]),
+      pdf_file: new FormControl(''),
+      image_file: new FormControl(''),
+      list_box: new FormArray([]),
+    });
+  }
 
 
   // Handles the checkbox change event in my form

@@ -250,10 +250,7 @@ export const insertDataTest = (req: Request, res: Response) => {
         })
         .catch((error: any) => {
             // Handling errors during the data insertion process
-            console.error('Insert Data Error:', error);
-            // if (!res.headersSent) {
-            //     res.status(500).json({ message: 'Internal server error' });
-            // }      
+            console.error('Insert Data Error:', error);     
             res.status(500).json({ message: 'Internal server error' });
         })
         .finally(() => {
