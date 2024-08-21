@@ -20,7 +20,7 @@ route.post('/forgot-password',selectDatabse, forgotPassword);
 
 route.post('/reset-password',selectDatabse, resetPassword);
 
-route.post('/insert-data-test', selectDatabse, upload.fields([
+route.post('/insert-data-test',authenticateJWT, selectDatabse, upload.fields([
     { name: 'pdf_file', maxCount: 1 },
     { name: 'image_file', maxCount: 1 }
   ]), insertDataTest);

@@ -229,8 +229,6 @@ export const insertDataTest = (req: Request, res: Response) => {
   const pdf_file = files['pdf_file'] ? files['pdf_file'][0]?.filename : null; // Access the filename of the uploaded PDF
   const image_file = files['image_file'] ? files['image_file'][0]?.filename : null; // Access the filename of the uploaded image
 
-
-
     console.log(req.body);
     console.log('Uploaded Files:', { pdf_file, image_file });
 

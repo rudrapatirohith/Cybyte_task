@@ -3,6 +3,7 @@ import { HttpClient, HttpClientModule, HttpHeaders } from '@angular/common/http'
 import { Component } from '@angular/core';
 import { FormArray, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { firstValueFrom } from 'rxjs';
+import { AuthService } from '../auth/auth.service';
 
 
 @Component({
@@ -41,7 +42,7 @@ export class FormComponent {
   // }
 
 
-  constructor(private http: HttpClient) {
+  constructor(private http: HttpClient,private authService: AuthService) {
     this.insertForm = new FormGroup({
       text_field: new FormControl(''),
       multi_line_text: new FormControl(''),
@@ -130,14 +131,14 @@ export class FormComponent {
       }
 
 
-      // const token = localStorage.getItem('jwtToken');
-      // const headers = new HttpHeaders({ 'Authorization': `Bearer ${token}` });
+      const token = this.authService.getToken();
+      const headers = new HttpHeaders({ 'Authorization': `Bearer ${token}` });
 
 
 
       try {
         // const response = await firstValueFrom(this.http.post('ttp://localhost:4242/api/insert-data-test', formData, { headers }));
-        const response = await firstValueFrom(this.http.post('http://localhost:4242/api/insert-data-test', formData));
+        const response = await firstValueFrom(this.http.post('http://localhost:4242/api/insert-data-test', formData,{headers}));
 
         console.log('Data inserted successfully:', response);
       } catch (error) {
@@ -167,8 +168,8 @@ export class FormComponent {
       }
    
 
-      // const token = localStorage.getItem('jwtToken');
-      // const headers = new HttpHeaders({ 'Authorization': `Bearer ${token}` });
+      const token = this.authService
+      const headers = new HttpHeaders({ 'Authorization': `Bearer ${token}` });
 
       try {
         const response = await firstValueFrom(this.http.put('http://localhost:4242/api/update-data', formData));

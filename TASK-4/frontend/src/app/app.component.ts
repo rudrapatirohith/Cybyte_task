@@ -2,8 +2,8 @@ import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterModule, RouterOutlet } from '@angular/router';
 import { FormComponent } from './form/form.component';
-import { LoginComponent } from './login/login.component';
-import { SignupComponent } from './signup/signup.component';
+import { LoginComponent } from './auth/login/login.component';
+import { SignupComponent } from './auth/signup/signup.component';
 
 @Component({
   selector: 'app-root',
