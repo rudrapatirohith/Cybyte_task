@@ -3,8 +3,6 @@ import bcrypt from 'bcrypt';
 import jwt, { JwtPayload } from 'jsonwebtoken';
 import dotenv from 'dotenv';
 import { PoolConnection } from 'mysql2/promise';
-import {insertInfo} from '../Models/database'
-import multer from 'multer';
 
 dotenv.config({ path: '././config.env' });
 
@@ -102,38 +100,7 @@ export const loginUser = (req: Request, res: Response) => {
         });
 };
 
-// Controller to insert data
-export const insertData = (req: Request, res: Response) => {
-    const {
-        text_field, multi_line_text, email, telephone, number_field,
-        date_field, time_field, timestamp_field, checkbox_field, dropdown_field,
-        radio_list, checkbox_list, pdf_file, image_file, list_box
-    } = req.body; // Extracting data fields from the request body
 
-    if(!text_field || !multi_line_text || !email || !telephone || !number_field ||
-        !date_field || !time_field || !timestamp_field || !checkbox_field || !dropdown_field
-      ||  !radio_list || !checkbox_list || !pdf_file || !image_file || !list_box){
-        res.status(401).json({message:'Missing data in some fields'})
-      }
-    req.db?.query(
-        'INSERT INTO patientsInfo (text_field, multi_line_text, email, telephone, number_field, date_field, time_field, timestamp_field, checkbox_field, dropdown_field, radio_list, checkbox_list, pdf_file, image_file, list_box) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
-        [text_field, multi_line_text, email, telephone, number_field, date_field, time_field, timestamp_field, checkbox_field, dropdown_field, radio_list, checkbox_list, pdf_file, image_file, list_box]
-    ) // Inserting the data into the database
-        .then((result: any) => {
-            // Sending a success response with the new data's ID
-            res.status(201).json({ message: 'Data inserted successfully', userId: result[0].insertId });
-        })
-        .catch((error: any) => {
-            // Handling errors during the data insertion process
-            console.error('Insert Data Error:', error);
-            res.status(500).json({ message: 'Internal server error' });
-        })
-        .finally(() => {
-            // Releasing the database connection after the operation is complete
-            req.db?.release();
-            console.log('Connection released after data insertion');
-        });
-};
 
 // Controller to handle user logout
 export const logoutUser = (req: Request, res: Response) => {
@@ -215,13 +182,26 @@ export const resetPassword = (req: Request, res: Response) => {
 
 
 // Controller to insert data
-export const insertDataTest = (req: Request, res: Response) => {
-    const {
+export const insertData = (req: Request, res: Response) => {
+    let {
         text_field, multi_line_text, email, telephone, number_field,
         date_field, time_field, timestamp_field, checkbox_field, dropdown_field,
         radio_list, checkbox_list, list_box
     } = req.body; // Extracting data fields from the request body
 
+    // Parse incoming data if needed
+    text_field = JSON.parse(text_field);
+    multi_line_text = JSON.parse(multi_line_text);
+    email = JSON.parse(email);
+    telephone = JSON.parse(telephone);
+    date_field = JSON.parse(date_field);
+    time_field = JSON.parse(time_field);
+    timestamp_field = JSON.parse(timestamp_field);
+    checkbox_field = JSON.parse(checkbox_field);
+    dropdown_field = JSON.parse(dropdown_field);
+    radio_list = JSON.parse(radio_list);
+    checkbox_list = JSON.parse(checkbox_list);
+    list_box = Array.isArray(list_box) ? list_box : JSON.parse(list_box);
 
   // Cast req.files to the expected type
   const files = req.files as Record<string, Express.Multer.File[]>;
@@ -238,9 +218,10 @@ export const insertDataTest = (req: Request, res: Response) => {
       ||  !radio_list || !checkbox_list  || !list_box){
         res.status(401).json({message:'Missing data in some fields'})
       }
+
     req.db?.query(
         'INSERT INTO patientsInfo (text_field, multi_line_text, email, telephone, number_field, date_field, time_field, timestamp_field, checkbox_field, dropdown_field, radio_list, checkbox_list, pdf_file, image_file, list_box) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
-        [text_field, multi_line_text, email, telephone, number_field, date_field, time_field, timestamp_field, checkbox_field, dropdown_field, radio_list, checkbox_list, pdf_file, image_file, list_box]
+        [text_field, multi_line_text, email, telephone, number_field, date_field, time_field, timestamp_field, checkbox_field, dropdown_field, radio_list, JSON.stringify(checkbox_list), pdf_file, image_file, JSON.stringify(list_box)]
     ) // Inserting the data into the database
         .then((result: any) => {
             // Sending a success response with the new data's ID
@@ -263,62 +244,62 @@ export const insertDataTest = (req: Request, res: Response) => {
 
 
 
-// Controller to insert data
-export const updateDataTest = (req: Request, res: Response) => {
-    const {
-        text_field, multi_line_text, email, telephone, number_field,
-        date_field, time_field, timestamp_field, checkbox_field, dropdown_field,
-        radio_list, checkbox_list, list_box
-    } = req.body; // Extracting data fields from the request body
+// // Controller to insert data
+// export const updateDataTest = (req: Request, res: Response) => {
+//     const {
+//         text_field, multi_line_text, email, telephone, number_field,
+//         date_field, time_field, timestamp_field, checkbox_field, dropdown_field,
+//         radio_list, checkbox_list, list_box
+//     } = req.body; // Extracting data fields from the request body
 
 
-  // Cast req.files to the expected type
-  const files = req.files as Record<string, Express.Multer.File[]>;
+//   // Cast req.files to the expected type
+//   const files = req.files as Record<string, Express.Multer.File[]>;
 
-  const pdf_file = files['pdf_file'] ? files['pdf_file'][0]?.filename : null; // Access the filename of the uploaded PDF
-  const image_file = files['image_file'] ? files['image_file'][0]?.filename : null; // Access the filename of the uploaded image
-
-
-
-    console.log(req.body);
-    console.log('Uploaded Files:', { pdf_file, image_file });
+//   const pdf_file = files['pdf_file'] ? files['pdf_file'][0]?.filename : null; // Access the filename of the uploaded PDF
+//   const image_file = files['image_file'] ? files['image_file'][0]?.filename : null; // Access the filename of the uploaded image
 
 
-    if(!text_field || !multi_line_text || !email || !telephone || !number_field ||
-        !date_field || !time_field || !timestamp_field || !checkbox_field || !dropdown_field
-      ||  !radio_list || !checkbox_list  || !list_box){
-        res.status(401).json({message:'Missing data in some fields'})
-      }
+
+//     console.log(req.body);
+//     console.log('Uploaded Files:', { pdf_file, image_file });
 
 
-      const userId = req.params.id;  // Assuming the ID of the record to update is passed in the URL
+//     if(!text_field || !multi_line_text || !email || !telephone || !number_field ||
+//         !date_field || !time_field || !timestamp_field || !checkbox_field || !dropdown_field
+//       ||  !radio_list || !checkbox_list  || !list_box){
+//         res.status(401).json({message:'Missing data in some fields'})
+//       }
 
-    req.db?.query(
-        `UPDATE patientsInfo 
-         SET text_field = ?, multi_line_text = ?, email = ?, telephone = ?, number_field = ?, 
-             date_field = ?, time_field = ?, timestamp_field = ?, checkbox_field = ?, dropdown_field = ?, 
-             radio_list = ?, checkbox_list = ?, pdf_file = ?, image_file = ?, list_box = ? 
-         WHERE id = ?`,
-        [text_field, multi_line_text, email, telephone, number_field, date_field, time_field, timestamp_field, checkbox_field, dropdown_field, radio_list, checkbox_list, pdf_file, image_file, list_box,userId]
-    ) // Inserting the data into the database
-        .then((result: any) => {
-            // Sending a success response with the new data's ID
-            if(result.affectedRows>0){
-                res.status(201).json({ message: 'Data updated successfully' });
-            }
-            else{
-                res.status(404).json({ message: 'Record not found' });
-            }
-        })
-        .catch((error: any) => {
-            // Handling errors during the data insertion process
-            console.error('Update Data Error:', error);
+
+//       const userId = req.params.id;  // Assuming the ID of the record to update is passed in the URL
+
+//     req.db?.query(
+//         `UPDATE patientsInfo 
+//          SET text_field = ?, multi_line_text = ?, email = ?, telephone = ?, number_field = ?, 
+//              date_field = ?, time_field = ?, timestamp_field = ?, checkbox_field = ?, dropdown_field = ?, 
+//              radio_list = ?, checkbox_list = ?, pdf_file = ?, image_file = ?, list_box = ? 
+//          WHERE id = ?`,
+//         [text_field, multi_line_text, email, telephone, number_field, date_field, time_field, timestamp_field, checkbox_field, dropdown_field, radio_list, checkbox_list, pdf_file, image_file, list_box,userId]
+//     ) // Inserting the data into the database
+//         .then((result: any) => {
+//             // Sending a success response with the new data's ID
+//             if(result.affectedRows>0){
+//                 res.status(201).json({ message: 'Data updated successfully' });
+//             }
+//             else{
+//                 res.status(404).json({ message: 'Record not found' });
+//             }
+//         })
+//         .catch((error: any) => {
+//             // Handling errors during the data insertion process
+//             console.error('Update Data Error:', error);
           
-            res.status(500).json({ message: 'Internal server error' });
-        })
-        .finally(() => {
-            // Releasing the database connection after the operation is complete
-            req.db?.release();
-            console.log('Connection released after data insertion');
-        });
-};
+//             res.status(500).json({ message: 'Internal server error' });
+//         })
+//         .finally(() => {
+//             // Releasing the database connection after the operation is complete
+//             req.db?.release();
+//             console.log('Connection released after data insertion');
+//         });
+// };

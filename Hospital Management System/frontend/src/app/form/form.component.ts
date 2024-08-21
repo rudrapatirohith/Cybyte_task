@@ -58,7 +58,7 @@ export class FormComponent {
       checkbox_list: new FormArray([]),
       pdf_file: new FormControl(''),
       image_file: new FormControl(''),
-      list_box: new FormArray([]),
+      list_box: new FormArray([], [Validators.required]),
     });
   }
 
@@ -134,7 +134,7 @@ export class FormComponent {
 
 
       try {
-        const response = await firstValueFrom(this.http.post('http://localhost:4242/api/insert-data-test', formData,{headers}));
+        const response = await firstValueFrom(this.http.post('http://localhost:4242/api/insert-data', formData,{headers}));
 
         console.log('Data inserted successfully:', response);
       } catch (error) {
