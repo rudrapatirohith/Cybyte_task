@@ -46,9 +46,9 @@ export class FormComponent {
     this.insertForm = new FormGroup({
       text_field: new FormControl(''),
       multi_line_text: new FormControl(''),
-      email: new FormControl('', [Validators.email]),
-      telephone: new FormControl('', [Validators.pattern(/^\d{10}$/)]),
-      number_field: new FormControl('', [Validators.min(1)]),
+      email: new FormControl(''),
+      telephone: new FormControl(''),
+      number_field: new FormControl(''),
       date_field: new FormControl(''),
       time_field: new FormControl(''),
       timestamp_field: new FormControl(''),
@@ -58,7 +58,7 @@ export class FormComponent {
       checkbox_list: new FormArray([]),
       pdf_file: new FormControl(''),
       image_file: new FormControl(''),
-      list_box: new FormArray([], [Validators.required]),
+      list_box: new FormArray([]),
     });
   }
 
@@ -86,14 +86,12 @@ export class FormComponent {
     
     const listBoxArray: FormArray = this.insertForm.get('list_box') as FormArray; // I'm grabbing the 'list_box' FormArray from my form
 
-    if (e.target.selected) {     // If an option in the list box is selected
-    
-      listBoxArray.push(new FormControl(e.target.value));   // pushing the selected value into the FormArray as a new FormControl
-    } else {
-      
-      const index = listBoxArray.controls.findIndex(x => x.value === e.target.value); // If the option is deselected, it will find the index of the FormControl with that value
-
-      listBoxArray.removeAt(index);    // removing that FormControl from the FormArray
+    listBoxArray.clear();
+    const options = e.target.options;
+    for(let i=0;i<options.length;i++){
+      if(options[i].selected){
+        listBoxArray.push(new FormControl(options[i].value));
+      }
     }
   }
 
