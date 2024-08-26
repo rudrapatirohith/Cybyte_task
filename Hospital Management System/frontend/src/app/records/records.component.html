@@ -1,0 +1,52 @@
+<div *ngIf="records.length > 0; else noRecords">
+    <div class="records-container">
+        <h2>Your Submitted Forms</h2>
+      <!-- <pre>{{ records | json }}</pre> -->
+        <table class="records-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Text Field</th>
+              <th>Multi-Line Text</th>
+              <th>Email</th>
+              <th>Telephone</th>
+              <th>Number Field</th>
+              <th>Date Field</th>
+              <th>Time Field</th>
+              <th>Timestamp Field</th>
+              <th>Image</th>
+              <th>PDF</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let record of records">
+              <td>{{ record.id }}</td>
+              <td>{{ record.text_field }}</td>
+              <td>{{ record.multi_line_text }}</td>
+              <td>{{ record.email }}</td>
+              <td>{{ record.telephone }}</td>
+              <td>{{ record.number_field }}</td>
+              <td>{{ record.date_field | date }}</td>
+              <td>{{ record.time_field }}</td>
+              <td>{{ record.timestamp_field | date:'short' }}</td>
+              <td>
+                <img *ngIf="record.image_file" [src]="getFileUrl(record.image_file)" alt="Image" width="100">
+              </td>
+              <td>
+                <a *ngIf="record.pdf_file" [href]="getFileUrl(record.pdf_file)" target="_blank">View PDF</a>
+              </td>
+              <td>
+                <button (click)="editRecord(record.id)">Edit</button>
+                <button (click)="deleteRecord(record.id)">Delete</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+  </div>
+  
+  <ng-template #noRecords>
+    <p>No records available.</p>
+  </ng-template>
+  

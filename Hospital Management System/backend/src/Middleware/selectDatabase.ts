@@ -3,7 +3,7 @@ import { createConnection } from "../Models/database";
 import { Connection, Pool, PoolConnection } from "mysql2/promise";
 
 
-export const selectDatabse = (req:Request,res: Response,next: NextFunction)=>{
+export const selectDatabase = (req:Request,res: Response,next: NextFunction)=>{
     const {id} = req.body || '1';
 
     // if(!id){

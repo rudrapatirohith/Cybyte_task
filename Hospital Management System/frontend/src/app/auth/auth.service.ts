@@ -7,23 +7,37 @@ import { Injectable } from "@angular/core";
 export class AuthService{
     constructor(){ }
 
+
+    // checking if localStorage is available 
+    private isLocalStorageAvailable(): boolean{
+        return typeof localStorage !== 'undefined';
+    }
+
     //save the token to localStorage
     saveToken(token: string): void{
-        localStorage.setItem('jwtToken',token);
-        const expirationTime = new Date().getTime()+5*60*1000;  // 5 minutes in milliseconds
-        localStorage.setItem('tokenExpiration',expirationTime.toString());
+        if(this.isLocalStorageAvailable()){
+            localStorage.setItem('jwtToken',token);
+            const expirationTime = new Date().getTime()+5*60*1000;  // 5 minutes in milliseconds
+            localStorage.setItem('tokenExpiration',expirationTime.toString());
+        }
     }
 
   // Retrieve the JWT token from localStorage
     getToken(): string | null {
-        return localStorage.getItem('jwtToken');
+        if(this.isLocalStorageAvailable()){
+            return localStorage.getItem('jwtToken');
+        }
+        return null;
     }
 
 
   // Retrieve the token expiration time from localStorage
     getTokenExpiration():number|null{
-        const expiration = localStorage.getItem('tokenExpiration');
-        return expiration?parseInt(expiration,10):null;
+        if(this.isLocalStorageAvailable()){
+            const expiration = localStorage.getItem('tokenExpiration');
+            return expiration?parseInt(expiration,10):null;
+        }
+        return null;
     }
 
     //check if the user is authenticated
@@ -43,7 +57,10 @@ export class AuthService{
 
   // Remove token and expiration time from localStorage (logout)
     clearToken(): void{
-        localStorage.removeItem('jwtToken'); // Remove the JWT token
-        localStorage.removeItem('tokenExpiration'); // Remove the token expiration time
+        if(this.isLocalStorageAvailable()){
+            localStorage.removeItem('jwtToken'); // Remove the JWT token
+            localStorage.removeItem('tokenExpiration'); // Remove the token expiration time
+        }
     }
+
 }

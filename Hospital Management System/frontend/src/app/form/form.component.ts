@@ -1,9 +1,12 @@
 import { CommonModule } from '@angular/common';
 import { HttpClient, HttpClientModule, HttpHeaders } from '@angular/common/http';
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormArray, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { firstValueFrom } from 'rxjs';
 import { AuthService } from '../auth/auth.service';
+import { RecordService } from '../records/record.service';
+import { ActivatedRoute, Router } from '@angular/router';
+import { error } from 'console';
 
 
 @Component({
@@ -18,8 +21,15 @@ import { AuthService } from '../auth/auth.service';
   templateUrl: './form.component.html',
   styleUrl: './form.component.scss'
 })
-export class FormComponent {
+
+
+export class FormComponent implements OnInit{
   insertForm: FormGroup;
+  isEditMode = false;
+  recordId: number | null = null;
+  selectedImage: File | null = null;
+  selectedPdf: File | null = null;
+
 
   // constructor(private http: HttpClient) {
   //   this.insertForm = new FormGroup({
@@ -42,7 +52,7 @@ export class FormComponent {
   // }
 
 
-  constructor(private http: HttpClient,private authService: AuthService) {
+  constructor(private http: HttpClient,private authService: AuthService, private recordService:RecordService,private router: Router, private route: ActivatedRoute) {
     this.insertForm = new FormGroup({
       text_field: new FormControl(''),
       multi_line_text: new FormControl(''),
@@ -62,59 +72,92 @@ export class FormComponent {
     });
   }
 
-
-
-  onCheckboxChange(e: any) {   // Handles the checkbox change event in my form
- 
-    const checkboxArray: FormArray = this.insertForm.get('checkbox_list') as FormArray;    // I'm grabbing the 'checkbox_list' FormArray from my form
-
-    
-    if (e.target.checked) {// If the checkbox is checked
-      
-      checkboxArray.push(new FormControl(e.target.value)); // pushing the checkbox value into the FormArray as a new FormControl
+  ngOnInit(): void {
+    const id = this.route.snapshot.paramMap.get('id'); // checking for id
+    this.recordId = id ? parseInt(id, 10) : null; // if id exist we will convert to int
+    if (this.recordId) {
+      this.isEditMode = true;
+      this.recordService.getRecordsById(this.recordId).subscribe({
+        next: (response) => {
+          const record = response.data[0];
+          console.log(record);
+  
+          // Parse JSON fields if necessary
+          if (typeof record.checkbox_list === 'string') {
+            try {
+              record.checkbox_list = JSON.parse(record.checkbox_list);
+            } catch (e) {
+              console.error('Failed to parse checkbox_list:', e);
+              record.checkbox_list = [];
+            }
+          }
+  
+          if (typeof record.list_box === 'string') {
+            try {
+              record.list_box = JSON.parse(record.list_box);
+            } catch (e) {
+              console.error('Failed to parse list_box:', e);
+              record.list_box = [];
+            }
+          }
+  
+          // Patch the form with the record data
+          this.insertForm.patchValue(record);
+  
+          // Populate checkbox and list box arrays if they exist
+          if (Array.isArray(record.checkbox_list)) {
+            const checkboxArray: FormArray = this.insertForm.get('checkbox_list') as FormArray;
+            record.checkbox_list.forEach((value: string) => {
+              checkboxArray.push(new FormControl(value));
+            });
+          }
+  
+          if (Array.isArray(record.list_box)) {
+            const listBoxArray: FormArray = this.insertForm.get('list_box') as FormArray;
+            record.list_box.forEach((value: string) => {
+              listBoxArray.push(new FormControl(value));
+            });
+          }
+        },
+        error: (error: any) => {
+          console.error('Error fetching record:', error);
+        }
+      });
+    }
+  }
+  
+  onCheckboxChange(e: any) {
+    const checkboxArray: FormArray = this.insertForm.get('checkbox_list') as FormArray;
+    if (e.target.checked) {
+      checkboxArray.push(new FormControl(e.target.value));
     } else {
-      
-      const index = checkboxArray.controls.findIndex(x => x.value === e.target.value); // If the checkbox is unchecked, finding the index of the FormControl that matches the value
-
-     
-      checkboxArray.removeAt(index);  // removing that FormControl from the FormArray
+      const index = checkboxArray.controls.findIndex(x => x.value === e.target.value);
+      checkboxArray.removeAt(index);
     }
   }
 
-
-  onListBoxChange(e: any) {   // Handles the list box change event in my form
-    
-    const listBoxArray: FormArray = this.insertForm.get('list_box') as FormArray; // I'm grabbing the 'list_box' FormArray from my form
-
+  onListBoxChange(e: any) {
+    const listBoxArray: FormArray = this.insertForm.get('list_box') as FormArray;
     listBoxArray.clear();
     const options = e.target.options;
-    for(let i=0;i<options.length;i++){
-      if(options[i].selected){
+    for (let i = 0; i < options.length; i++) {
+      if (options[i].selected) {
         listBoxArray.push(new FormControl(options[i].value));
       }
     }
   }
 
- 
-  onFileChange(event: any, controlName: string) {  // Handles the file input change event in my form
-
-    const file = event.target.files[0];  // getting the first file from the file input (since I’m only allowing single file uploads)
-   
-    this.insertForm.patchValue({     // updating the form control with the selected file using patchValue
+  onFileChange(event: any, controlName: string) {
+    const file = event.target.files[0];
+    this.insertForm.patchValue({
       [controlName]: file
     });
-
-    
-    this.insertForm.get(controlName)?.updateValueAndValidity(); //  to update the validity of the form control after setting the value
+    this.insertForm.get(controlName)?.updateValueAndValidity();
   }
 
-
-
-  // Marked the method as 'async'
   async onSubmit() {
     if (this.insertForm.valid) {
       const formData = new FormData();
-
 
       for (const key in this.insertForm.controls) {
         const controlValue = this.insertForm.get(key)?.value;
@@ -125,16 +168,18 @@ export class FormComponent {
         }
       }
 
-
       const token = this.authService.getToken();
       const headers = new HttpHeaders({ 'Authorization': `Bearer ${token}` });
 
-
-
       try {
-        const response = await firstValueFrom(this.http.post('http://localhost:4242/api/insert-data', formData,{headers}));
-
-        console.log('Data inserted successfully:', response);
+        if (this.isEditMode && this.recordId) {
+          const response = await firstValueFrom(this.http.put(`http://localhost:4242/api/records/${this.recordId}`, formData, { headers }));
+          console.log('Data updated successfully:', response);
+        } else {
+          const response = await firstValueFrom(this.http.post('http://localhost:4242/api/insert-data', formData, { headers }));
+          console.log('Data inserted successfully:', response);
+        }
+        this.router.navigate(['/records']);
       } catch (error) {
         console.error('Error inserting data:', error);
       }
@@ -142,37 +187,4 @@ export class FormComponent {
       console.error('Form is invalid');
     }
   }
-
 }
-
-
-//   // Marked the method as 'async'
-//   async onUpdate() {
-//     if (this.insertForm.valid) {
-//       const formData = new FormData();
-
-
-//       for (const key in this.insertForm.controls) {
-//         const controlValue = this.insertForm.get(key)?.value;
-//         if (controlValue instanceof File) {
-//           formData.append(key, controlValue);
-//         } else {
-//           formData.append(key, JSON.stringify(controlValue));
-//         }
-//       }
-   
-
-//       const token = this.authService
-//       const headers = new HttpHeaders({ 'Authorization': `Bearer ${token}` });
-
-//       try {
-//         const response = await firstValueFrom(this.http.put('http://localhost:4242/api/update-data', formData));
-//         console.log('Data updated successfully:', response);
-//       } catch (error) {
-//         console.error('Error updating data:', error);
-//       }
-//     } else {
-//       console.error('Form is invalid');
-//     }
-//   }
-// }

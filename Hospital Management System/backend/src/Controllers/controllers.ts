@@ -4,12 +4,14 @@ import jwt, { JwtPayload } from 'jsonwebtoken';
 import dotenv from 'dotenv';
 import { PoolConnection } from 'mysql2/promise';
 
+
 dotenv.config({ path: '././config.env' });
 
 // Extending the Request interface to include a custom `db` property for database connection
 declare module 'express' {
     interface Request {
         db?: PoolConnection;
+        user?: JwtPayload;
     }
 }
 
@@ -189,7 +191,7 @@ export const insertData = (req: Request, res: Response) => {
         radio_list, checkbox_list, list_box
     } = req.body; // Extracting data fields from the request body
 
-    // Parse incoming data if needed
+    // // Parse incoming data if needed
     text_field = JSON.parse(text_field);
     multi_line_text = JSON.parse(multi_line_text);
     email = JSON.parse(email);
@@ -202,6 +204,7 @@ export const insertData = (req: Request, res: Response) => {
     radio_list = JSON.parse(radio_list);
     checkbox_list = JSON.parse(checkbox_list);
     list_box = Array.isArray(list_box) ? list_box : JSON.parse(list_box);
+
 
   // Cast req.files to the expected type
   const files = req.files as Record<string, Express.Multer.File[]>;
@@ -219,9 +222,16 @@ export const insertData = (req: Request, res: Response) => {
         res.status(401).json({message:'Missing data in some fields'})
       }
 
+    // Parse incoming data if needed
+    const userId = (req as any).user?.userId; // Get user ID from the request object
+      
+    if (!userId) {
+        return res.status(401).json({ message: 'User not authenticated' });
+    }
+
     req.db?.query(
-        'INSERT INTO patientsInfo (text_field, multi_line_text, email, telephone, number_field, date_field, time_field, timestamp_field, checkbox_field, dropdown_field, radio_list, checkbox_list, pdf_file, image_file, list_box) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
-        [text_field, multi_line_text, email, telephone, number_field, date_field, time_field, timestamp_field, checkbox_field, dropdown_field, radio_list, JSON.stringify(checkbox_list), pdf_file, image_file, JSON.stringify(list_box)]
+        'INSERT INTO patientsInfo (text_field, multi_line_text, email, telephone, number_field, date_field, time_field, timestamp_field, checkbox_field, dropdown_field, radio_list, checkbox_list, pdf_file, image_file, list_box,user_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?)',
+        [text_field, multi_line_text, email, telephone, number_field, date_field, time_field, timestamp_field, checkbox_field, dropdown_field, radio_list, JSON.stringify(checkbox_list), pdf_file, image_file, JSON.stringify(list_box),userId]
     ) // Inserting the data into the database
         .then((result: any) => {
             // Sending a success response with the new data's ID
@@ -243,63 +253,138 @@ export const insertData = (req: Request, res: Response) => {
 
 
 
+// Controller to update data
+export const updateData = (req: Request, res: Response) => {
+    const {
+        text_field, multi_line_text, email, telephone, number_field,
+        date_field, time_field, timestamp_field, checkbox_field, dropdown_field,
+        radio_list, checkbox_list, list_box
+    } = req.body;
 
-// // Controller to insert data
-// export const updateDataTest = (req: Request, res: Response) => {
-//     const {
-//         text_field, multi_line_text, email, telephone, number_field,
-//         date_field, time_field, timestamp_field, checkbox_field, dropdown_field,
-//         radio_list, checkbox_list, list_box
-//     } = req.body; // Extracting data fields from the request body
+    const files = req.files as Record<string, Express.Multer.File[]>;
 
-
-//   // Cast req.files to the expected type
-//   const files = req.files as Record<string, Express.Multer.File[]>;
-
-//   const pdf_file = files['pdf_file'] ? files['pdf_file'][0]?.filename : null; // Access the filename of the uploaded PDF
-//   const image_file = files['image_file'] ? files['image_file'][0]?.filename : null; // Access the filename of the uploaded image
+    const pdf_file = files['pdf_file'] ? files['pdf_file'][0]?.filename : null;
+    const image_file = files['image_file'] ? files['image_file'][0]?.filename : null;
 
 
+    console.log(req.body);
+    console.log('Uploaded Files:', { pdf_file, image_file });
 
-//     console.log(req.body);
-//     console.log('Uploaded Files:', { pdf_file, image_file });
+    if(!text_field || !multi_line_text || !email || !telephone || !number_field ||
+        !date_field || !time_field || !timestamp_field || !checkbox_field || !dropdown_field
+      ||  !radio_list || !checkbox_list  || !list_box){
+        res.status(401).json({message:'Missing data in some fields'})
+      }
+
+    const userId = (req as any).user?.userId; 
+    const recordId = (req as any).params?.id;
+
+    req.db?.query(
+        `UPDATE patientsInfo 
+         SET text_field = ?, multi_line_text = ?, email = ?, telephone = ?, number_field = ?, 
+             date_field = ?, time_field = ?, timestamp_field = ?, checkbox_field = ?, dropdown_field = ?, 
+             radio_list = ?, checkbox_list = ?, pdf_file = COALESCE(?, pdf_file), image_file = COALESCE(?, image_file), list_box = ? 
+         WHERE id = ? AND user_id = ?`,
+        [text_field, multi_line_text, email, telephone, number_field, date_field, time_field, timestamp_field, checkbox_field, dropdown_field, radio_list, JSON.stringify(checkbox_list), pdf_file, image_file, JSON.stringify(list_box),recordId, userId]
+    )
+        .then((result: any) => {
+            if(result[0].affectedRows > 0) {
+                res.status(200).json({ message: 'Data updated successfully' });
+            } else {
+                res.status(404).json({ message: 'Record not found' });
+            }
+        })
+        .catch((error: any) => {
+            console.error('Update Data Error:', error);
+            res.status(500).json({ message: 'Internal server error' });
+        })
+        .finally(() => {
+            req.db?.release();
+            console.log('Connection released after data update');
+        });
+};
 
 
-//     if(!text_field || !multi_line_text || !email || !telephone || !number_field ||
-//         !date_field || !time_field || !timestamp_field || !checkbox_field || !dropdown_field
-//       ||  !radio_list || !checkbox_list  || !list_box){
-//         res.status(401).json({message:'Missing data in some fields'})
-//       }
+
+// Controller to get data by ID
+export const getData = (req:Request,res:Response)=>{
+    const userId = (req.user as JwtPayload).userId;
+
+    req.db?.query('SELECT * FROM patientsInfo WHERE user_id = ?',[userId])
+    .then((result:any)=>{
+        console.log(result);
+        
+        const rows= result[0];
+        if(rows.length>0){
+            res.status(200).json({data: rows});
+        }
+        else{
+            res.status(404).json({message:'Record not found'});
+        }
+    })
+    .catch((error: any)=>{
+        console.error('Get Data Error:', error);
+        res.status(500).json({message:'Internal server error'});
+    })
+    .finally(()=>{
+        req.db?.release();
+        console.log('Connection released after data retrieval');
+        
+    })
+}
 
 
-//       const userId = req.params.id;  // Assuming the ID of the record to update is passed in the URL
 
-//     req.db?.query(
-//         `UPDATE patientsInfo 
-//          SET text_field = ?, multi_line_text = ?, email = ?, telephone = ?, number_field = ?, 
-//              date_field = ?, time_field = ?, timestamp_field = ?, checkbox_field = ?, dropdown_field = ?, 
-//              radio_list = ?, checkbox_list = ?, pdf_file = ?, image_file = ?, list_box = ? 
-//          WHERE id = ?`,
-//         [text_field, multi_line_text, email, telephone, number_field, date_field, time_field, timestamp_field, checkbox_field, dropdown_field, radio_list, checkbox_list, pdf_file, image_file, list_box,userId]
-//     ) // Inserting the data into the database
-//         .then((result: any) => {
-//             // Sending a success response with the new data's ID
-//             if(result.affectedRows>0){
-//                 res.status(201).json({ message: 'Data updated successfully' });
-//             }
-//             else{
-//                 res.status(404).json({ message: 'Record not found' });
-//             }
-//         })
-//         .catch((error: any) => {
-//             // Handling errors during the data insertion process
-//             console.error('Update Data Error:', error);
-          
-//             res.status(500).json({ message: 'Internal server error' });
-//         })
-//         .finally(() => {
-//             // Releasing the database connection after the operation is complete
-//             req.db?.release();
-//             console.log('Connection released after data insertion');
-//         });
-// };
+// Controller to get data by ID
+export const getDataById = (req:Request,res:Response)=>{
+    const userId = (req.user as JwtPayload).userId;
+    const recordId = (req as any).params?.id;
+
+
+    req.db?.query('SELECT * FROM patientsInfo WHERE user_id = ? and id=?',[userId,recordId])
+    .then((result:any)=>{
+        console.log(result);
+        
+        const rows= result[0];
+        if(rows.length>0){
+            res.status(200).json({data: rows});
+        }
+        else{
+            res.status(404).json({message:'Record not found'});
+        }
+    })
+    .catch((error: any)=>{
+        console.error('Get Data Error:', error);
+        res.status(500).json({message:'Internal server error'});
+    })
+    .finally(()=>{
+        req.db?.release();
+        console.log('Connection released after data retrieval');
+        
+    })
+}
+
+
+// Controller to delete data by ID
+export const deleteData = (req:Request,res:Response)=>{
+    const userId = (req as any).user?.userId;
+    const recordId = (req as any).params?.id;
+
+    req.db?.query('DELETE FROM patientsInfo WHERE id =? AND user_id=?',[recordId,userId])
+    .then((result:any)=>{
+        if(result[0].affectedRows>0){
+            res.status(200).json({message:'Data Deleted Successfully'});
+        }
+        else{
+            res.status(404).json({message:'Record not found'});
+        }
+    })
+    .catch((error:any)=>{
+        console.error('Delete Data Error:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    })
+    .finally(()=>{
+        req.db?.release();
+        console.log('Connection released after data deletion');
+    });
+};

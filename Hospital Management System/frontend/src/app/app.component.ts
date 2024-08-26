@@ -4,6 +4,8 @@ import { RouterLink, RouterLinkActive, RouterModule, RouterOutlet } from '@angul
 import { FormComponent } from './form/form.component';
 import { LoginComponent } from './auth/login/login.component';
 import { SignupComponent } from './auth/signup/signup.component';
+import { RecordsComponent } from './records/records.component';
+import { AuthService } from './auth/auth.service';
 
 @Component({
   selector: 'app-root',
@@ -13,5 +15,6 @@ import { SignupComponent } from './auth/signup/signup.component';
   styleUrl: './app.component.scss'
 })
 export class AppComponent {
-  title = 'frontend-dev';
+  constructor(public authService: AuthService) {}
+  title = 'Hospital Management System';
 }

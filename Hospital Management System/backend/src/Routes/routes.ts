@@ -1,31 +1,40 @@
 import express from 'express';
-import { forgotPassword, insertData, loginUser, logoutUser, resetPassword, Signup } from '../Controllers/controllers';
+import { deleteData, forgotPassword, getData, getDataById, insertData, loginUser, logoutUser, resetPassword, Signup, updateData } from '../Controllers/controllers';
 import { authenticateJWT } from '../Middleware/jwttoken';
-import { selectDatabse } from '../Middleware/selectDatabase';
+import { selectDatabase } from '../Middleware/selectDatabase';
 import multer from 'multer';
 
 const route = express.Router();
 const upload = multer({dest: 'uploads/' });
 
 // Routes
-route.post('/signup',selectDatabse, Signup);
+route.post('/signup',selectDatabase, Signup);
 
-route.post('/login',selectDatabse, loginUser);
+route.post('/login',selectDatabase, loginUser);
 
-route.post('/logout',selectDatabse, logoutUser);
+route.post('/logout',selectDatabase, logoutUser);
 
-route.post('/forgot-password',selectDatabse, forgotPassword);
+route.post('/forgot-password',selectDatabase, forgotPassword);
 
-route.post('/reset-password',selectDatabse, resetPassword);
+route.post('/reset-password',selectDatabase, resetPassword);
 
-route.post('/insert-data',authenticateJWT, selectDatabse, upload.fields([
+route.post('/insert-data',authenticateJWT, selectDatabase, upload.fields([
     { name: 'pdf_file', maxCount: 1 },
     { name: 'image_file', maxCount: 1 }
   ]), insertData);
 
-// route.post('/update-data-test/:id', selectDatabse, upload.fields([
-//     { name: 'pdf_file', maxCount: 1 },
-//     { name: 'image_file', maxCount: 1 }
-//   ]), updateDataTest);
+// Update data route
+route.put('/records/:id', authenticateJWT, selectDatabase, upload.fields([
+  { name: 'pdf_file', maxCount: 1 },
+  { name: 'image_file', maxCount: 1 }
+]), updateData);
+
+route.get('/records/:id', authenticateJWT, selectDatabase, getDataById);
+
+// Get data route
+route.get('/records', authenticateJWT, selectDatabase, getData);
+
+// Delete data route
+route.delete('/records/:id', authenticateJWT, selectDatabase, deleteData);
 
 export default route;
