@@ -14,6 +14,11 @@
               <th>Date Field</th>
               <th>Time Field</th>
               <th>Timestamp Field</th>
+              <th>CheckBox Feild</th>
+              <th>Dropdown Feild</th>
+              <th>Radio List</th>
+              <th>CheckBox List</th>
+              <th>List Box</th>
               <th>Image</th>
               <th>PDF</th>
               <th>Actions</th>
@@ -30,8 +35,13 @@
               <td>{{ record.date_field | date }}</td>
               <td>{{ record.time_field }}</td>
               <td>{{ record.timestamp_field | date:'short' }}</td>
+              <td>{{record.checkbox_field}}</td>
+              <td>{{record.dropdown_field}}</td>
+              <td>{{record.radio_list}}</td>
+              <td>{{record.checkbox_list}}</td>
+              <td>{{record.list_box}}</td>
               <td>
-                <img *ngIf="record.image_file" [src]="getFileUrl(record.image_file)" alt="Image" width="100">
+                <img *ngIf="record.image_file" [src]="getFileUrl(record.image_file)" alt="Image" style="width: 100px; height: auto;">
               </td>
               <td>
                 <a *ngIf="record.pdf_file" [href]="getFileUrl(record.pdf_file)" target="_blank">View PDF</a>

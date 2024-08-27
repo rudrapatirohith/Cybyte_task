@@ -23,6 +23,8 @@ interface Record {
   pdf_file: string;
   image_file: string;
   list_box: string[];
+  image_file_url: string; // Marked as optional
+  pdf_file_url: string;   // Marked as optional
 }
 
 interface ApiResponse {

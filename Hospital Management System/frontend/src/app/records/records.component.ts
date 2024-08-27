@@ -35,8 +35,10 @@ this.recordsService.getRecords().subscribe({
 }
 
 
+
+
 getFileUrl(filename: string): string {
-  return `http://localhost:4242/api/uploads/${filename}`;
+  return `http://localhost:4242/api/file/${filename}`;
 }
 
 

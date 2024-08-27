@@ -7,6 +7,7 @@ import { AuthService } from '../auth/auth.service';
 import { RecordService } from '../records/record.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { error } from 'console';
+import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 
 
 @Component({
@@ -27,8 +28,8 @@ export class FormComponent implements OnInit{
   insertForm: FormGroup;
   isEditMode = false;
   recordId: number | null = null;
-  selectedImage: File | null = null;
-  selectedPdf: File | null = null;
+  imageFileUrl: SafeUrl | null = null;
+  pdfFileUrl: SafeUrl | null = null;
 
 
   // constructor(private http: HttpClient) {
@@ -52,7 +53,7 @@ export class FormComponent implements OnInit{
   // }
 
 
-  constructor(private http: HttpClient,private authService: AuthService, private recordService:RecordService,private router: Router, private route: ActivatedRoute) {
+  constructor(private http: HttpClient,private authService: AuthService, private recordService:RecordService,private router: Router, private route: ActivatedRoute, private sanitizer: DomSanitizer) {
     this.insertForm = new FormGroup({
       text_field: new FormControl(''),
       multi_line_text: new FormControl(''),
@@ -82,6 +83,16 @@ export class FormComponent implements OnInit{
           const record = response.data[0];
           console.log(record);
   
+
+          if(record.image_file){
+            this.imageFileUrl = this.sanitizer.bypassSecurityTrustUrl(`data:image/jpeg;base64,${record.image_file}`);
+          }
+
+
+          if(record.pdf_file){
+            this.pdfFileUrl = this.sanitizer.bypassSecurityTrustResourceUrl(`data:application/pdf;base64,${record.pdf_file}`);
+          }
+          
           // Parse JSON fields if necessary
           if (typeof record.checkbox_list === 'string') {
             try {
@@ -99,6 +110,14 @@ export class FormComponent implements OnInit{
               console.error('Failed to parse list_box:', e);
               record.list_box = [];
             }
+          }
+
+          if(typeof record.date_field === 'string'){
+            record.date_field = new Date(record.date_field).toISOString().split('T')[0];
+          }
+
+          if(typeof record.timestamp_field === 'string'){
+            record.timestamp_field = new Date(record.timestamp_field).toISOString().slice(0,16);
           }
   
           // Patch the form with the record data
@@ -124,6 +143,11 @@ export class FormComponent implements OnInit{
         }
       });
     }
+  }
+  
+
+  getFileUrl(filename: string): string {
+    return `http://localhost:4242/api/file/${filename}`;
   }
   
   onCheckboxChange(e: any) {
@@ -163,8 +187,11 @@ export class FormComponent implements OnInit{
         const controlValue = this.insertForm.get(key)?.value;
         if (controlValue instanceof File) {
           formData.append(key, controlValue);
-        } else {
+        }
+        else if(Array.isArray(controlValue) || typeof controlValue === 'object'){
           formData.append(key, JSON.stringify(controlValue));
+        } else {
+          formData.append(key, controlValue);
         }
       }
 

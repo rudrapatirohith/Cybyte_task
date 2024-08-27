@@ -1,31 +1,41 @@
 <form [formGroup]="insertForm" (ngSubmit)="onSubmit()">
+  <!-- Text Field -->
   <label for="text_field">Text Field:</label>
   <input id="text_field" formControlName="text_field" type="text" />
 
+  <!-- Multi-line Text -->
   <label for="multi_line_text">Multi-line Text:</label>
   <textarea id="multi_line_text" formControlName="multi_line_text"></textarea>
 
+  <!-- Email -->
   <label for="email">Email:</label>
   <input id="email" formControlName="email" type="email" />
 
+  <!-- Telephone -->
   <label for="telephone">Telephone:</label>
   <input id="telephone" formControlName="telephone" type="text" />
 
+  <!-- Number Field -->
   <label for="number_field">Number Field:</label>
   <input id="number_field" formControlName="number_field" type="number" />
 
+  <!-- Date Field -->
   <label for="date_field">Date Field:</label>
   <input id="date_field" formControlName="date_field" type="date" />
 
+  <!-- Time Field -->
   <label for="time_field">Time Field:</label>
   <input id="time_field" formControlName="time_field" type="time" />
 
+  <!-- Timestamp Field -->
   <label for="timestamp_field">Timestamp Field:</label>
   <input id="timestamp_field" formControlName="timestamp_field" type="datetime-local" />
 
+  <!-- Checkbox Field -->
   <label for="checkbox_field">Checkbox Field:</label>
   <input id="checkbox_field" formControlName="checkbox_field" type="checkbox" />
 
+  <!-- Dropdown -->
   <label for="dropdown_field">Dropdown:</label>
   <select id="dropdown_field" formControlName="dropdown_field">
     <option value="">Select...</option>
@@ -33,25 +43,38 @@
     <option value="option2">Option 2</option>
   </select>
 
+  <!-- Radio List -->
   <label>Radio List:</label>
   <label><input type="radio" formControlName="radio_list" value="radio1" /> Radio 1</label>
   <label><input type="radio" formControlName="radio_list" value="radio2" /> Radio 2</label>
 
+  <!-- Checkbox List -->
   <label>Checkbox List:</label>
-  <label><input type="checkbox" (change)="onCheckboxChange($event)" value="checkbox1" /> Checkbox 1</label>
-  <label><input type="checkbox" (change)="onCheckboxChange($event)" value="checkbox2" /> Checkbox 2</label>
+  <label><input type="checkbox" (change)="onCheckboxChange($event)" value="check1" /> Check 1</label>
+  <label><input type="checkbox" (change)="onCheckboxChange($event)" value="check2" /> Check 2</label>
 
-  <label>List Box:</label>
-  <select multiple (change)="onListBoxChange($event)">
+  <!-- List Box -->
+  <label for="list_box">List Box:</label>
+  <select id="list_box" formControlName="list_box" multiple (change)="onListBoxChange($event)">
     <option value="item1">Item 1</option>
     <option value="item2">Item 2</option>
+    <option value="item3">Item 3</option>
   </select>
 
-  <label for="pdf_file">PDF File:</label>
-  <input id="pdf_file" type="file" (change)="onFileChange($event, 'pdf_file')" />
-
+  <!-- Image File -->
   <label for="image_file">Image File:</label>
   <input id="image_file" type="file" (change)="onFileChange($event, 'image_file')" />
+  <div *ngIf="insertForm.get('image_file')?.value">
+    <img [src]="getFileUrl(insertForm.get('image_file')?.value)" alt="Uploaded Image" style="max-width: 100px; max-height: 100px;" />
+  </div>
 
+  <!-- PDF File -->
+  <label for="pdf_file">PDF File:</label>
+  <input id="pdf_file" type="file" (change)="onFileChange($event, 'pdf_file')" />
+  <div *ngIf="insertForm.get('pdf_file')?.value">
+    <a [href]="getFileUrl(insertForm.get('pdf_file')?.value)" target="_blank">View PDF</a>
+  </div>
+
+  <!-- Submit Button -->
   <button type="submit">Submit</button>
 </form>

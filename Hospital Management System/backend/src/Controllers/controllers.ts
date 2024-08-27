@@ -3,6 +3,8 @@ import bcrypt from 'bcrypt';
 import jwt, { JwtPayload } from 'jsonwebtoken';
 import dotenv from 'dotenv';
 import { PoolConnection } from 'mysql2/promise';
+import fs from 'fs';
+import path from "path";
 
 
 dotenv.config({ path: '././config.env' });
@@ -191,23 +193,46 @@ export const insertData = (req: Request, res: Response) => {
         radio_list, checkbox_list, list_box
     } = req.body; // Extracting data fields from the request body
 
-    // // Parse incoming data if needed
-    text_field = JSON.parse(text_field);
-    multi_line_text = JSON.parse(multi_line_text);
-    email = JSON.parse(email);
-    telephone = JSON.parse(telephone);
-    date_field = JSON.parse(date_field);
-    time_field = JSON.parse(time_field);
-    timestamp_field = JSON.parse(timestamp_field);
-    checkbox_field = JSON.parse(checkbox_field);
-    dropdown_field = JSON.parse(dropdown_field);
-    radio_list = JSON.parse(radio_list);
-    checkbox_list = JSON.parse(checkbox_list);
-    list_box = Array.isArray(list_box) ? list_box : JSON.parse(list_box);
+    
 
+    const parseJSON = (data: any) => {
+        try {
+            // Check if data is a string and looks like JSON
+            if (typeof data === 'string' && (data.startsWith('{') || data.startsWith('['))) {
+                return JSON.parse(data);
+            }
+            return data;
+        } catch (e) {
+            console.error('JSON Parsing Error:', e);
+            return null;
+        }
+    };
+    
+    
+
+
+    // // Parse incoming data if needed
+    text_field = parseJSON(text_field);
+    multi_line_text = parseJSON(multi_line_text);
+    email = parseJSON(email);
+    telephone = parseJSON(telephone);
+    date_field = parseJSON(date_field);
+    time_field = parseJSON(time_field);
+    timestamp_field = parseJSON(timestamp_field);
+    checkbox_field = parseJSON(checkbox_field);
+    dropdown_field = parseJSON(dropdown_field);
+    radio_list = parseJSON(radio_list);
+    checkbox_list = parseJSON(checkbox_list);
+    // list_box = Array.isArray(list_box) ? list_box : JSON.parse(list_box);
+    list_box = parseJSON(list_box);
 
   // Cast req.files to the expected type
   const files = req.files as Record<string, Express.Multer.File[]>;
+ 
+  if (!files) {
+    return res.status(400).json({ message: 'No files uploaded' });
+  }
+
 
   const pdf_file = files['pdf_file'] ? files['pdf_file'][0]?.filename : null; // Access the filename of the uploaded PDF
   const image_file = files['image_file'] ? files['image_file'][0]?.filename : null; // Access the filename of the uploaded image
@@ -316,6 +341,13 @@ export const getData = (req:Request,res:Response)=>{
         
         const rows= result[0];
         if(rows.length>0){
+             // Construct URLs for image and PDF files
+      if (rows.image_file) {
+        rows.image_file_url = `${req.protocol}://${req.get('host')}/uploads/${rows.image_file}`;
+      }
+      if (rows.pdf_file) {
+        rows.pdf_file_url = `${req.protocol}://${req.get('host')}/uploads/${rows.pdf_file}`;
+      }
             res.status(200).json({data: rows});
         }
         else{
@@ -388,3 +420,7 @@ export const deleteData = (req:Request,res:Response)=>{
         console.log('Connection released after data deletion');
     });
 };
+
+
+
+
