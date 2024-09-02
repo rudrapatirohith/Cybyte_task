@@ -17,7 +17,7 @@ export class AuthService{
     saveToken(token: string): void{
         if(this.isLocalStorageAvailable()){
             localStorage.setItem('jwtToken',token);
-            const expirationTime = new Date().getTime()+5*60*1000;  // 5 minutes in milliseconds
+            const expirationTime = new Date().getTime()+30*60*1000;  // 30 minutes in milliseconds
             localStorage.setItem('tokenExpiration',expirationTime.toString());
         }
     }

@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { HttpClient, HttpClientModule, HttpHeaders } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
-import { FormArray, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormArray, FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { firstValueFrom } from 'rxjs';
 import { AuthService } from '../auth/auth.service';
 import { RecordService } from '../records/record.service';
@@ -20,7 +20,7 @@ import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 
   ],
   templateUrl: './form.component.html',
-  styleUrl: './form.component.scss'
+  styleUrls: ['./form.component.scss']
 })
 
 
@@ -53,44 +53,74 @@ export class FormComponent implements OnInit{
   // }
 
 
-  constructor(private http: HttpClient,private authService: AuthService, private recordService:RecordService,private router: Router, private route: ActivatedRoute, private sanitizer: DomSanitizer) {
-    this.insertForm = new FormGroup({
-      text_field: new FormControl(''),
-      multi_line_text: new FormControl(''),
-      email: new FormControl(''),
-      telephone: new FormControl(''),
-      number_field: new FormControl(''),
-      date_field: new FormControl(''),
-      time_field: new FormControl(''),
-      timestamp_field: new FormControl(''),
-      checkbox_field: new FormControl(false),
-      dropdown_field: new FormControl(''),
-      radio_list: new FormControl(''),
-      checkbox_list: new FormArray([]),
-      pdf_file: new FormControl(''),
-      image_file: new FormControl(''),
-      list_box: new FormArray([]),
+  constructor(private fb: FormBuilder,private http: HttpClient,private authService: AuthService, private recordService:RecordService,private router: Router, private route: ActivatedRoute) {
+    // this.insertForm = new FormGroup({
+    //   text_field: new FormControl(''),
+    //   multi_line_text: new FormControl(''),
+    //   email: new FormControl(''),
+    //   telephone: new FormControl(''),
+    //   number_field: new FormControl(''),
+    //   date_field: new FormControl(''),
+    //   time_field: new FormControl(''),
+    //   timestamp_field: new FormControl(''),
+    //   checkbox_field: new FormControl(false),
+    //   dropdown_field: new FormControl(''),
+    //   radio_list: new FormControl(''),
+    //   checkbox_list: new FormArray([]),
+    //   pdf_file: new FormControl(''),
+    //   image_file: new FormControl(''),
+    //   list_box: new FormArray([]),
+    this.insertForm = this.fb.group({
+      text_field: ['', Validators.required],
+      multi_line_text: ['', Validators.required],
+      email: ['', [Validators.required, Validators.email]],
+      telephone: ['', Validators.required],
+      number_field: [null, Validators.required],
+      date_field: ['', Validators.required],
+      time_field: ['', Validators.required],
+      timestamp_field: ['', Validators.required],
+      checkbox_field: [false],
+      dropdown_field: ['', Validators.required],
+      radio_list: ['', Validators.required],
+      checkbox_list: this.fb.array([]), // Initialize as FormArray for checkbox list
+      list_box: this.fb.array([]), // Initialize as FormArray for list box selections
+      pdf_file: [''],
+      image_file: ['']
     });
   }
 
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id'); // checking for id
     this.recordId = id ? parseInt(id, 10) : null; // if id exist we will convert to int
-    if (this.recordId) {
+    if(this.recordId){
       this.isEditMode = true;
-      this.recordService.getRecordsById(this.recordId).subscribe({
+      this.loadRecord(this.recordId);
+    }
+  }
+
+
+    loadRecord(recordId:number):void{
+      this.recordService.getRecordsById(recordId).subscribe({
         next: (response) => {
-          const record = response.data[0];
-          console.log(record);
-  
+          console.log(response);
+          
+          console.log('Response from server:', response);
+
+          const record = response.data;
+          console.log('Record data:',record);
+
+           if (!record) {
+                    console.error('Record is undefined or null.');
+                    return;
+                }
 
           if(record.image_file){
-            this.imageFileUrl = this.sanitizer.bypassSecurityTrustUrl(`data:image/jpeg;base64,${record.image_file}`);
+            this.imageFileUrl = this.getFileUrl(record.image_file);
           }
 
 
           if(record.pdf_file){
-            this.pdfFileUrl = this.sanitizer.bypassSecurityTrustResourceUrl(`data:application/pdf;base64,${record.pdf_file}`);
+            this.pdfFileUrl = this.getFileUrl(record.pdf_file);
           }
           
           // Parse JSON fields if necessary
@@ -123,26 +153,30 @@ export class FormComponent implements OnInit{
           // Patch the form with the record data
           this.insertForm.patchValue(record);
   
-          // Populate checkbox and list box arrays if they exist
-          if (Array.isArray(record.checkbox_list)) {
-            const checkboxArray: FormArray = this.insertForm.get('checkbox_list') as FormArray;
-            record.checkbox_list.forEach((value: string) => {
-              checkboxArray.push(new FormControl(value));
-            });
-          }
+
+      // Populate checkbox_list FormArray
+      const checkboxArray: FormArray = this.insertForm.get('checkbox_list') as FormArray;
+      checkboxArray.clear();
+      if (Array.isArray(record.checkbox_list)) {
+        record.checkbox_list.forEach((value: string) => {
+          checkboxArray.push(new FormControl(value));
+        });
+      }
   
-          if (Array.isArray(record.list_box)) {
-            const listBoxArray: FormArray = this.insertForm.get('list_box') as FormArray;
-            record.list_box.forEach((value: string) => {
-              listBoxArray.push(new FormControl(value));
-            });
-          }
+        // Populate list_box FormArray
+      const listBoxArray: FormArray = this.insertForm.get('list_box') as FormArray;
+      listBoxArray.clear();
+      if (Array.isArray(record.list_box)) {
+        record.list_box.forEach((value: string) => {
+          listBoxArray.push(new FormControl(value));
+        });
+      }
         },
         error: (error: any) => {
           console.error('Error fetching record:', error);
         }
       });
-    }
+    // }
   }
   
 
@@ -158,6 +192,9 @@ export class FormComponent implements OnInit{
       const index = checkboxArray.controls.findIndex(x => x.value === e.target.value);
       checkboxArray.removeAt(index);
     }
+  //   this.insertForm.patchValue({
+  //   checkbox_field: checkboxArray.length > 0 ? 1 : 0 // update checkbox_field if needed
+  // });
   }
 
   onListBoxChange(e: any) {
@@ -190,6 +227,9 @@ export class FormComponent implements OnInit{
         }
         else if(Array.isArray(controlValue) || typeof controlValue === 'object'){
           formData.append(key, JSON.stringify(controlValue));
+        }
+        else if(key === 'checkbox_feild'){
+          formData.append(key, controlValue ? '1' : '0'); // Convert boolean to '1' or '0'
         } else {
           formData.append(key, controlValue);
         }

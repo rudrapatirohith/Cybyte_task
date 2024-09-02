@@ -21,6 +21,8 @@ app.use(cors(
 
 // This Middleware helps us to serve static files from the 'public' directory
 app.use(bodyParser.json());
+// app.use(express.json());
+
 
 // Middleware to parse URL-encoded payloads
 app.use(bodyParser.urlencoded({ extended: true }));

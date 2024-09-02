@@ -64,15 +64,15 @@
   <!-- Image File -->
   <label for="image_file">Image File:</label>
   <input id="image_file" type="file" (change)="onFileChange($event, 'image_file')" />
-  <div *ngIf="insertForm.get('image_file')?.value">
-    <img [src]="getFileUrl(insertForm.get('image_file')?.value)" alt="Uploaded Image" style="max-width: 100px; max-height: 100px;" />
+  <div *ngIf="imageFileUrl">
+    <img [src]="imageFileUrl" alt="Uploaded Image" style="max-width: 100px; max-height: 100px;" />
   </div>
 
   <!-- PDF File -->
   <label for="pdf_file">PDF File:</label>
   <input id="pdf_file" type="file" (change)="onFileChange($event, 'pdf_file')" />
-  <div *ngIf="insertForm.get('pdf_file')?.value">
-    <a [href]="getFileUrl(insertForm.get('pdf_file')?.value)" target="_blank">View PDF</a>
+  <div *ngIf="pdfFileUrl">
+    <a [href]="pdfFileUrl" target="_blank">View PDF</a>
   </div>
 
   <!-- Submit Button -->
