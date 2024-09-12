@@ -38,6 +38,8 @@ export const insertData = (req: CustomRequest, res: Response): void => {
         radio_list, checkbox_list, list_box
     } = req.body;
 
+    checkbox_field = checkbox_field ? 1 : 0; // Ensuring checkbox_field is 1 or 0
+
     text_field = parseJSON(text_field);
     multi_line_text = parseJSON(multi_line_text);
     email = parseJSON(email);
@@ -54,7 +56,7 @@ export const insertData = (req: CustomRequest, res: Response): void => {
     const files = req.files as Record<string, Express.Multer.File[]>;
     const pdf_file = files['pdf_file'] ? files['pdf_file'][0]?.filename || '' : '';
     const image_file = files['image_file'] ? files['image_file'][0]?.filename || '' : '';
-
+    
     const userId = (req.user as any)?.userId;
     if (!userId) {
         res.status(401).json({ message: 'User not authenticated' });
@@ -74,7 +76,7 @@ export const insertData = (req: CustomRequest, res: Response): void => {
         checkbox_field,
         dropdown_field,
         radio_list,
-        checkbox_list,
+        checkbox_list:Array.isArray(req.body.checkbox_list) ? req.body.checkbox_list : [],
         pdf_file: pdf_file || '',
         image_file: image_file || '',
         list_box
@@ -92,11 +94,13 @@ export const insertData = (req: CustomRequest, res: Response): void => {
 export const updateData = (req: CustomRequest, res: Response): void => {
     const db: PoolConnection = req.db as PoolConnection;
 
-    const {
+    let {
         text_field, multi_line_text, email, telephone, number_field,
         date_field, time_field, timestamp_field, checkbox_field, dropdown_field,
         radio_list, checkbox_list, list_box
     } = req.body;
+
+    checkbox_field = checkbox_field ? 1 : 0; // Ensure checkbox_field is 1 or 0
 
     const files = req.files as Record<string, Express.Multer.File[]>;
     const pdf_file = files['pdf_file'] ? files['pdf_file'][0]?.filename || '' : '';
@@ -122,7 +126,7 @@ export const updateData = (req: CustomRequest, res: Response): void => {
         checkbox_field,
         dropdown_field,
         radio_list,
-        checkbox_list,
+        checkbox_list:Array.isArray(req.body.checkbox_list) ? req.body.checkbox_list.join(',') : req.body.checkbox_list,
         pdf_file: pdf_file || '',
         image_file: image_file || '',
         list_box,
@@ -152,6 +156,10 @@ export const getDataById = (req: CustomRequest, res: Response): void => {
     getFormDataById(db, recordId, userId)
     .then((data) => {
         if (data) {
+
+            data.checkbox_list = parseJSON(data.checkbox_list) || [];
+            data.list_box = parseJSON(data.list_box) || [];
+
             if (data.image_file) {
                 data.image_file_url = `${req.protocol}://${req.get('host')}/uploads/${data.image_file}`;
             }
@@ -183,6 +191,10 @@ export const getAllData = (req: CustomRequest, res: Response): void => {
     getAllFormData(db, userId)
     .then((data) => {
         data.forEach(record => {
+
+            record.checkbox_list = parseJSON(record.checkbox_list) || [];
+            record.list_box = parseJSON(record.list_box) || [];
+
             if (record.image_file) {
                 record.image_file_url = `${req.protocol}://${req.get('host')}/uploads/${record.image_file}`;
             }

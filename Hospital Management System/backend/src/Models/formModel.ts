@@ -29,11 +29,16 @@ export const insertFormData = async (connection: PoolConnection, data: FormData)
         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
 
+    // const values = [
+    //     data.user_id, data.text_field, data.multi_line_text, data.email, data.telephone, data.number_field,
+    //     data.date_field, data.time_field, data.timestamp_field, data.checkbox_field, data.dropdown_field,
+    //     data.radio_list, JSON.stringify(data.checkbox_list), data.pdf_file, data.image_file,
+    //     JSON.stringify(data.list_box)
     const values = [
         data.user_id, data.text_field, data.multi_line_text, data.email, data.telephone, data.number_field,
         data.date_field, data.time_field, data.timestamp_field, data.checkbox_field, data.dropdown_field,
-        data.radio_list, JSON.stringify(data.checkbox_list), data.pdf_file, data.image_file,
-        JSON.stringify(data.list_box)
+        data.radio_list,data.checkbox_list.join(','), data.pdf_file, data.image_file,
+        data.list_box
     ];
 
     return connection.execute(query, values)
@@ -65,6 +70,23 @@ export const updateFormData = async (connection: PoolConnection, id: number, dat
     `;
 
     const values = [
+        // data.text_field || null, 
+        // data.multi_line_text || null, 
+        // data.email || null, 
+        // data.telephone || null, 
+        // data.number_field || null,
+        // data.date_field || null, 
+        // data.time_field || null, 
+        // data.timestamp_field || null, 
+        // data.checkbox_field || null, 
+        // data.dropdown_field || null,
+        // data.radio_list || null, 
+        // JSON.stringify(data.checkbox_list) || null, 
+        // data.pdf_file || null, 
+        // data.image_file || null,
+        // JSON.stringify(data.list_box) || null, 
+        // id, 
+        // data.user_id
         data.text_field || null, 
         data.multi_line_text || null, 
         data.email || null, 
@@ -76,10 +98,10 @@ export const updateFormData = async (connection: PoolConnection, id: number, dat
         data.checkbox_field || null, 
         data.dropdown_field || null,
         data.radio_list || null, 
-        JSON.stringify(data.checkbox_list) || null, 
+        data.checkbox_list || null, 
         data.pdf_file || null, 
         data.image_file || null,
-        JSON.stringify(data.list_box) || null, 
+        data.list_box || null, 
         id, 
         data.user_id
     ];
@@ -99,7 +121,7 @@ export const getFormDataById = async (connection: PoolConnection, id: number, us
         .then(([rows]) => {
             const [row] = rows as FormData[];
             if(row){
-                row.checkbox_field = JSON.parse(row.checkbox_list as unknown as string);
+                row.checkbox_list = JSON.parse(row.checkbox_list as unknown as string);
                 row.list_box = JSON.parse(row.list_box as unknown as string);
             }
             return row || null;

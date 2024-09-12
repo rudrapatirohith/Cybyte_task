@@ -114,6 +114,8 @@ export class FormComponent implements OnInit{
                     return;
                 }
 
+                // record.checkbox_field = record.checkbox_field === '1' || record.checkbox_field === true || record.checkbox_field === 'true';
+
           if(record.image_file){
             this.imageFileUrl = this.getFileUrl(record.image_file);
           }
@@ -149,14 +151,16 @@ export class FormComponent implements OnInit{
           if(typeof record.timestamp_field === 'string'){
             record.timestamp_field = new Date(record.timestamp_field).toISOString().slice(0,16);
           }
-  
+
+
+
           // Patch the form with the record data
           this.insertForm.patchValue(record);
   
 
       // Populate checkbox_list FormArray
       const checkboxArray: FormArray = this.insertForm.get('checkbox_list') as FormArray;
-      checkboxArray.clear();
+      // checkboxArray.clear();
       if (Array.isArray(record.checkbox_list)) {
         record.checkbox_list.forEach((value: string) => {
           checkboxArray.push(new FormControl(value));
@@ -165,7 +169,7 @@ export class FormComponent implements OnInit{
   
         // Populate list_box FormArray
       const listBoxArray: FormArray = this.insertForm.get('list_box') as FormArray;
-      listBoxArray.clear();
+      // listBoxArray.clear();
       if (Array.isArray(record.list_box)) {
         record.list_box.forEach((value: string) => {
           listBoxArray.push(new FormControl(value));
@@ -186,6 +190,7 @@ export class FormComponent implements OnInit{
   
   onCheckboxChange(e: any) {
     const checkboxArray: FormArray = this.insertForm.get('checkbox_list') as FormArray;
+    checkboxArray.clear();
     if (e.target.checked) {
       checkboxArray.push(new FormControl(e.target.value));
     } else {
@@ -196,6 +201,8 @@ export class FormComponent implements OnInit{
   //   checkbox_field: checkboxArray.length > 0 ? 1 : 0 // update checkbox_field if needed
   // });
   }
+
+
 
   onListBoxChange(e: any) {
     const listBoxArray: FormArray = this.insertForm.get('list_box') as FormArray;
@@ -220,6 +227,7 @@ export class FormComponent implements OnInit{
     if (this.insertForm.valid) {
       const formData = new FormData();
 
+      
       for (const key in this.insertForm.controls) {
         const controlValue = this.insertForm.get(key)?.value;
         if (controlValue instanceof File) {
