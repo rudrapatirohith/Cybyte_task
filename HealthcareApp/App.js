@@ -36,7 +36,7 @@ const App = () => {
         </Animated.View>
         <DescriptionSection
           subtitle="About This App"
-          description="OnCare360 is a comprehensive health care application designed to address all your health-related queries. Our platform provides reliable and up-to-date information to help you make informed decisions about your health. Explore our resources to get expert guidance and support anytime, anywhere."
+          description="OnCare360 is your go-to healthcare app, providing expert guidance and up-to-date information to support informed health decisions anytime, anywhere."
         />
       </View>
 
