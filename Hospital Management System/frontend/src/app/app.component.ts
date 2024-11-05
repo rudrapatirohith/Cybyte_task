@@ -6,11 +6,13 @@ import { LoginComponent } from './auth/login/login.component';
 import { SignupComponent } from './auth/signup/signup.component';
 import { RecordsComponent } from './records/records.component';
 import { AuthService } from './auth/auth.service';
+import { HomeComponent } from './home/home.component';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet,CommonModule, RouterLink, RouterLinkActive,RouterModule,FormComponent,LoginComponent,SignupComponent],
+  imports: [RouterOutlet,CommonModule, RouterLink, RouterLinkActive,RouterModule,FormComponent,LoginComponent,SignupComponent,HomeComponent, FormsModule],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })

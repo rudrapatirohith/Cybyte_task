@@ -6,7 +6,9 @@ import path from 'path';
 import { serveFile } from '../Middleware/serveFile';
 import { upload } from '../Middleware/multerConfig';
 import { forgotPassword, loginUser, logoutUser, resetPassword, Signup } from '../Controllers/userControllers';
-import { deleteData, getAllData, getDataById, insertData, updateData } from '../Controllers/FormController';
+import { deleteData, getAllData, getDataById, insertData, updateData } from "../Controllers/formController";
+import { getAllFormDataInfo } from '../Controllers/homeController';
+import { selectDb } from '../Middleware/selectdb';
 
 const route = express.Router();
 
@@ -77,5 +79,8 @@ route.get('/file/:filename', (req, res) => {
   const filePath = path.join(__dirname, '../../uploads', filename);
   serveFile(res, filePath); // Use the utility function
 });
+
+
+route.get('/home', selectDb , getAllFormDataInfo);
 
 export default route;

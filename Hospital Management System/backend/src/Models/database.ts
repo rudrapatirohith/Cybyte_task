@@ -21,6 +21,7 @@ const createConnection = async (id: string): Promise<Pool> => {
             queueLimit: 0,
             connectTimeout: 10000
         };
+        
     } else if (id === '2') {
         connectionConfig = {
             host: process.env.DB02_HOST,

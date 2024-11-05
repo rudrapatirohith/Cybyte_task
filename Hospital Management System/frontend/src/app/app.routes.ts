@@ -5,6 +5,7 @@ import { SignupComponent } from './auth/signup/signup.component';
 import { authGuard } from './auth/auth.guard';
 import { LogoutComponent } from './auth/logout/logout.component';
 import { RecordsComponent } from './records/records.component';
+import { HomeComponent } from './home/home.component';
 
 export const routes: Routes = [
     {
@@ -28,5 +29,8 @@ export const routes: Routes = [
     {
         path: 'form/:id', component: FormComponent, canActivate: [authGuard]  // Route for viewing/editing a specific record
 
+    },
+    {
+        path: 'home', component: HomeComponent
     }
 ];

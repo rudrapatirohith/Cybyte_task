@@ -1,0 +1,21 @@
+<!-- homecomp.html -->
+<div class="container">
+  <h1>Select Database</h1>
+  <div class="form-group">
+    <select [(ngModel)]="selectedDbId" class="form-control">
+      <option value="" disabled>Select Database</option>
+      <option value="1">Database 1</option>
+      <option value="2">Database 2</option>
+    </select>
+    <button (click)="fetchRecords()" class="btn btn-primary mt-2">Fetch Records</button>
+  </div>
+
+  <div *ngIf="records" class="record-list">
+    <h2>Data from Database {{ selectedDbId }}</h2>
+    <ul>
+      <li *ngFor="let record of records">
+       Id : {{record.id}} || Name : {{ record.name }} || Email : {{ record.email }}
+      </li>
+    </ul>
+  </div>
+</div>
