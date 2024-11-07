@@ -11,7 +11,7 @@ const AIWebViewModal = ({ modalVisible, closeWebView }) => (
       <TouchableOpacity onPress={closeWebView} style={styles.closeButton}>
         <Ionicons name="close-outline" size={30} color="white" />
       </TouchableOpacity>
-      <WebView source={{ uri: AI_ASSISTANT_URL }} style={styles.webview} />
+      <WebView source={{ uri: AI_ASSISTANT_URL }} style={styles.webview}   javaScriptEnabled={true}   domStorageEnabled={true}   startInLoadingState={true}   cacheEnabled={true}   userAgent=" Chrome/130.0.6723.102 Safari/537.36"/>
     </View>
   </Modal>
 );
